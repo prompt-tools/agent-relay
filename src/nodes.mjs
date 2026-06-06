@@ -17,6 +17,11 @@ export function getProvider(home, nodeId) {
   return nodes[nodeId]?.provider || 'manual';
 }
 
+export function getNodeSpec(home, nodeId) {
+  const { nodes } = loadNodes(home);
+  return nodes[nodeId] || { provider: 'manual' };
+}
+
 export function setNode(home, nodeId, { provider, binary }) {
   const data = loadNodes(home);
   data.nodes = data.nodes || {};

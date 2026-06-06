@@ -4,8 +4,14 @@ All notable changes to agent-relay. Format based on [Keep a Changelog](https://k
 
 ## [Unreleased]
 
+### Fixed
+
+- launchd `spawn hermes ENOENT` — store absolute binary paths in `nodes.yaml`, inject PATH in plist
+- relayd spawn errors no longer crash daemon (`child.on('error')`)
+
 ### Added
 
+- `relay health` and `relay status --health` diagnostics
 - `scripts/auth.mjs` — role-based OAuth checks (`hermes login`, etc.)
 - Interactive `relay setup` with readline prompts
 - `launchctl bootstrap` after writing launchd plist

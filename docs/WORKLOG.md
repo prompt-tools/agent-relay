@@ -39,6 +39,19 @@
 
 ---
 
+## 2026-06-07 — GitHub 发布 + 正式环境 + health
+
+**完成**：
+- push main + `v0.1.0` tag + [GitHub Release](https://github.com/prompt-tools/agent-relay/releases/tag/v0.1.0)
+- `relay health` / `relay status --health`
+- `~/.agent-relay` 正式 setup（receiver hermes + sender cursor MCP）
+- **修复** launchd `spawn hermes ENOENT` → nodes.yaml 绝对路径 + plist PATH
+- **正式 E2E 成功**：`PROD2 OK` 回传到 `pending/cursor/`
+
+**测试**：27/27 pass
+
+---
+
 ## 2026-06-07 — 项目记忆与 GitHub 基建
 
 **完成**：

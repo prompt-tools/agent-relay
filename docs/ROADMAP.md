@@ -16,15 +16,15 @@
 - [x] cursor → hermes E2E 实测
 - [x] project.yaml 路由
 - [x] MEMORY / WORKLOG / AGENTS.md
-- [ ] GitHub 发布 `v0.1.0` tag
-- [ ] 本机 `~/.agent-relay` 长期运行验证
+- [x] GitHub 发布 `v0.1.0` tag + Release
+- [x] 本机 `~/.agent-relay` 长期运行验证（PROD2 OK）
 
 ## Phase 2 — 体验加固
 
 - [ ] cursor-agent provider（反向唤醒）
 - [ ] 失败自动重试 / `type:progress` 可观测
 - [ ] setup 图形化或 TUI
-- [ ] `relay status --health` 一键诊断
+- [x] `relay health` / `relay status --health` 一键诊断
 
 ## Phase 3 — 可选扩展
 

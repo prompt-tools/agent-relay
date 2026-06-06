@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { layout } from './paths.mjs';
 import { loadConfig } from './config.mjs';
 import { listTasks, claimTask } from './store.mjs';
-import { getProvider } from './nodes.mjs';
+import { getProvider, getNodeSpec } from './nodes.mjs';
 import { buildCodexSpawn } from './providers/codex.mjs';
 import { buildHermesSpawn } from './providers/hermes.mjs';
 
@@ -60,7 +60,8 @@ export function buildSpawnForTask(home, task) {
   const provider = getProvider(home, task.to);
   const build = PROVIDERS[provider];
   if (!build) return null;
-  return build(task, { home, relayBin: RELAY_BIN });
+  const spec = getNodeSpec(home, task.to);
+  return build(task, { home, relayBin: RELAY_BIN, binary: spec.binary });
 }
 
 export function wakeTask(home, task, { spawnFn = spawn } = {}) {
@@ -71,6 +72,9 @@ export function wakeTask(home, task, { spawnFn = spawn } = {}) {
     stdio: 'ignore',
     cwd: task.projectPath,
     env: { ...process.env, ...spec.env },
+  });
+  child.on('error', (err) => {
+    relayLog(home, { op: 'spawn_error', id: task.id, cmd: spec.cmd, error: err.message });
   });
   child.unref();
   return { woke: true, pid: child.pid, spec };

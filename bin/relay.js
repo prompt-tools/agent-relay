@@ -2,6 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { initConfig, loadConfig } from '../src/config.mjs';
 import { resolveSendTarget } from '../src/project.mjs';
+import { healthReport } from '../src/health.mjs';
 import {
   sendTask,
   listTasks,
@@ -26,7 +27,8 @@ Usage:
   relay list <node> [--status pending|active|done|failed]
   relay claim <node> [taskId]
   relay show <taskId>
-  relay status
+  relay status [--health]
+  relay health
   relay setup [--role sender|receiver|both] [--node <nodeId>] [--dry-run] [--skip-auth]
 
 Deprecated (use send/receive instead):
@@ -167,7 +169,16 @@ async function run() {
     return;
   }
 
+  if (cmd === 'health') {
+    console.log(JSON.stringify(healthReport(config.home), null, 2));
+    return;
+  }
+
   if (cmd === 'status') {
+    if (args.includes('--health')) {
+      console.log(JSON.stringify({ ...status(config), health: healthReport(config.home) }, null, 2));
+      return;
+    }
     console.log(JSON.stringify(status(config), null, 2));
     return;
   }

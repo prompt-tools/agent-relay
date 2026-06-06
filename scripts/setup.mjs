@@ -21,6 +21,14 @@ export const CLI_CANDIDATES = {
   antigravity: { binary: 'agy', provider: 'antigravity-cli', nodeId: 'antigravity' },
 };
 
+export function resolveBinaryPath(binary) {
+  try {
+    return execSync(`command -v ${binary}`, { encoding: 'utf8' }).trim();
+  } catch {
+    return binary;
+  }
+}
+
 export function commandExists(binary) {
   try {
     execSync(`command -v ${binary}`, { stdio: 'ignore' });
@@ -64,8 +72,12 @@ export function mergeMcpConfig(configPath, relayMcpPath) {
 }
 
 export function buildLaunchdPlist({ home, relaydPath, nodeEnv = {} }) {
+  const pathEnv = [process.env.PATH, `${homedir()}/.local/bin`, '/opt/homebrew/bin', '/usr/local/bin']
+    .filter(Boolean)
+    .join(':');
   const envXml = Object.entries({
     AGENT_RELAY_HOME: home,
+    PATH: pathEnv,
     ...nodeEnv,
   })
     .map(([k, v]) => `    <key>${k}</key>\n    <string>${v}</string>`)
@@ -115,7 +127,7 @@ export function configureNodes(home, { role, nodeId, detected }) {
   if (role === 'receiver' || role === 'both') {
     const self = detected.find((d) => d.nodeId === nodeId);
     const provider = self?.provider || 'manual';
-    const binary = self?.binary;
+    const binary = self?.binary ? resolveBinaryPath(self.binary) : undefined;
     setNode(home, nodeId, { provider, ...(binary ? { binary } : {}) });
     results.push({ nodeId, provider, binary, role: 'receiver' });
   }

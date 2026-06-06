@@ -38,6 +38,12 @@
 - **receiver**：写 `nodes.yaml`、launchd、`hermes login`（交互时）。
 - `--skip-auth` 给 CI/已登录用户；`--yes` 非交互。
 
+### launchd 没有交互式 PATH
+
+- `spawn hermes ENOENT`：launchd 环境找不到 `~/.local/bin/hermes`。
+- **修复**：`nodes.yaml` 存 **绝对路径**；launchd plist 注入 `PATH`。
+- spawn 必须监听 `error` 事件，否则 relayd 会崩。
+
 ### 工具调用会超时
 
 - 长轮询 / MCP move 可能被中断；**直接写文件**比反复 Shell 更稳。

@@ -40,7 +40,7 @@ test('tick claims hermes plan and wakes', () => {
   const home = mkdtempSync(join(tmpdir(), 'agent-relay-relayd-'));
   try {
     const config = initConfig(home, 'hermes');
-    setNode(home, 'hermes', { provider: 'hermes-cli' });
+    setNode(home, 'hermes', { provider: 'hermes-cli', binary: 'hermes' });
     sendTask(config, {
       type: 'plan',
       to: 'hermes',
@@ -49,11 +49,11 @@ test('tick claims hermes plan and wakes', () => {
       title: 'T',
       body: { markdown: 'x' },
     });
-    const fakeSpawn = () => ({ unref() {}, pid: 999 });
+    const fakeSpawn = () => ({ unref() {}, on() {}, pid: 999 });
     const results = tick(home, { spawnFn: fakeSpawn });
     assert.equal(results.length, 1);
     assert.equal(results[0].woke, true);
-    assert.equal(results[0].spec.cmd, 'hermes');
+    assert.ok(results[0].spec.cmd.includes('hermes'));
   } finally {
     rmSync(home, { recursive: true, force: true });
   }
@@ -72,7 +72,7 @@ test('tick claims plan and records processed', () => {
       title: 'T',
       body: { markdown: 'x' },
     });
-    const fakeSpawn = () => ({ unref() {}, pid: 999 });
+    const fakeSpawn = () => ({ unref() {}, on() {}, pid: 999 });
     const results = tick(home, { spawnFn: fakeSpawn });
     assert.equal(results.length, 1);
     assert.equal(results[0].woke, true);
