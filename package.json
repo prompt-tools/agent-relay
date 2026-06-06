@@ -4,7 +4,9 @@
   "description": "Lightweight cross-IDE agent task relay — plan in Cursor, execute in Hermes, artifacts back.",
   "type": "module",
   "bin": {
-    "relay": "./bin/relay.js"
+    "relay": "./bin/relay.js",
+    "relayd": "./bin/relayd.js",
+    "relay-mcp": "./mcp/server.mjs"
   },
   "scripts": {
     "relay": "node bin/relay.js",

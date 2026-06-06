@@ -1,6 +1,5 @@
 import {
   readFileSync,
-  writeFileSync,
   renameSync,
   readdirSync,
   existsSync,
@@ -9,12 +8,13 @@ import {
   fsyncSync,
   appendFileSync,
   mkdirSync,
-  unlinkSync,
+  writeFileSync,
 } from 'node:fs';
 import { join } from 'node:path';
 import { randomBytes } from 'node:crypto';
 import { layout, ensureLayout } from './paths.mjs';
 import { assertNode } from './config.mjs';
+import { validateEnvelope } from './schema.mjs';
 
 function atomicWriteJson(filePath, data) {
   const dir = join(filePath, '..');
@@ -39,6 +39,10 @@ function appendLog(home, entry) {
   });
 }
 
+function taskFileName(id) {
+  return `${id}.json`;
+}
+
 export function newTaskId() {
   const d = new Date();
   const pad = (n) => String(n).padStart(2, '0');
@@ -46,31 +50,49 @@ export function newTaskId() {
   return `${stamp}-${randomBytes(2).toString('hex')}`;
 }
 
-export function sendTask(config, { to, from, title, planMarkdown, acceptance = [], refs = {} }) {
+export function sendTask(config, input) {
+  const {
+    type = 'plan',
+    to,
+    from,
+    projectPath,
+    title,
+    body = {},
+    taskId,
+    acceptance = [],
+    refs = {},
+  } = input;
+
+  const planMarkdown = input.planMarkdown ?? body.markdown;
+  const legacyPlan = planMarkdown !== undefined;
+
   assertNode(config, to);
   assertNode(config, from);
   ensureLayout(config.home);
   const p = layout(config.home);
   const id = newTaskId();
-  const file = join(p.pending(to), `${id}.plan.json`);
+  const file = join(p.pending(to), taskFileName(id));
   if (existsSync(file)) throw new Error(`Task id collision: ${id}`);
-  const task = {
+
+  const task = validateEnvelope({
     id,
-    version: 1,
+    version: 2,
+    type,
     from,
     to,
+    projectPath,
     status: 'pending',
     createdAt: new Date().toISOString(),
     title: title || 'Untitled task',
-    plan: {
-      markdown: planMarkdown,
-      acceptance,
-      refs,
-    },
+    body: legacyPlan
+      ? { markdown: planMarkdown, acceptance, refs, ...body }
+      : body,
+    ...(taskId ? { taskId } : {}),
     replyTo: from,
-  };
+  });
+
   atomicWriteJson(file, task);
-  appendLog(config.home, { op: 'send', id, from, to });
+  appendLog(config.home, { op: 'send', id, type, from, to });
   return task;
 }
 
@@ -78,13 +100,19 @@ function readJson(path) {
   return JSON.parse(readFileSync(path, 'utf8'));
 }
 
+function listTaskFiles(dir) {
+  if (!existsSync(dir)) return [];
+  return readdirSync(dir).filter((f) => f.endsWith('.json') || f.endsWith('.plan.json'));
+}
+
 function findTaskFile(config, id) {
   const p = layout(config.home);
   for (const node of config.nodes) {
     for (const bucket of ['pending', 'active', 'done', 'failed']) {
-      const dir = join(p.tasks, bucket, node);
-      const f = join(dir, `${id}.plan.json`);
-      if (existsSync(f)) return { bucket, node, path: f };
+      for (const name of [taskFileName(id), `${id}.plan.json`]) {
+        const f = join(p.tasks, bucket, node, name);
+        if (existsSync(f)) return { bucket, node, path: f };
+      }
     }
   }
   return null;
@@ -94,11 +122,15 @@ export function listTasks(config, node, status = 'pending') {
   assertNode(config, node);
   const p = layout(config.home);
   const dir = join(p.tasks, status, node);
-  if (!existsSync(dir)) return [];
-  return readdirSync(dir)
-    .filter((f) => f.endsWith('.plan.json'))
+  return listTaskFiles(dir)
     .map((f) => readJson(join(dir, f)))
     .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
+}
+
+export function receiveTasks(config, node, { type } = {}) {
+  const tasks = listTasks(config, node, 'pending');
+  if (!type) return tasks;
+  return tasks.filter((t) => t.type === type);
 }
 
 export function claimTask(config, node, id) {
@@ -106,14 +138,16 @@ export function claimTask(config, node, id) {
   const p = layout(config.home);
   let src;
   if (id) {
-    src = join(p.pending(node), `${id}.plan.json`);
+    src = join(p.pending(node), taskFileName(id));
+    if (!existsSync(src)) src = join(p.pending(node), `${id}.plan.json`);
   } else {
     const pending = listTasks(config, node, 'pending');
     if (!pending.length) throw new Error(`No pending tasks for ${node}`);
     id = pending[0].id;
-    src = join(p.pending(node), `${id}.plan.json`);
+    src = join(p.pending(node), taskFileName(id));
+    if (!existsSync(src)) src = join(p.pending(node), `${id}.plan.json`);
   }
-  const dst = join(p.active(node), `${id}.plan.json`);
+  const dst = join(p.active(node), taskFileName(id));
   if (!existsSync(src)) throw new Error(`Task not pending: ${id}`);
   try {
     renameSync(src, dst);
@@ -128,91 +162,6 @@ export function claimTask(config, node, id) {
   return task;
 }
 
-function writeResult(config, task, result) {
-  const p = layout(config.home);
-  const inboxFile = join(p.inbox(task.replyTo), `${task.id}.result.json`);
-  if (existsSync(inboxFile)) return readJson(inboxFile);
-  atomicWriteJson(inboxFile, result);
-  appendLog(config.home, { op: result.status, id: task.id, to: task.replyTo });
-  return result;
-}
-
-export function completeTask(config, node, id, { summary, artifactsDir, files = [] }) {
-  assertNode(config, node);
-  const p = layout(config.home);
-  const activePath = join(p.active(node), `${id}.plan.json`);
-  const donePath = join(p.done(node), `${id}.plan.json`);
-  if (existsSync(donePath)) {
-    const existing = readJson(donePath);
-    return writeResult(config, existing, {
-      taskId: id,
-      from: node,
-      to: existing.replyTo,
-      status: 'completed',
-      completedAt: existing.completedAt,
-      summary: existing.summary || summary,
-      artifacts: existing.artifacts,
-      blockers: [],
-    });
-  }
-  if (!existsSync(activePath)) throw new Error(`Task not active: ${id}`);
-  const task = readJson(activePath);
-  task.status = 'completed';
-  task.completedAt = new Date().toISOString();
-  task.summary = summary;
-  const art = artifactsDir || p.artifacts(id);
-  const result = {
-    taskId: id,
-    from: node,
-    to: task.replyTo,
-    status: 'completed',
-    completedAt: task.completedAt,
-    summary,
-    artifacts: { dir: art, files },
-    blockers: [],
-  };
-  task.result = result;
-  atomicWriteJson(donePath, task);
-  if (existsSync(activePath)) unlinkSync(activePath);
-  return writeResult(config, task, result);
-}
-
-export function failTask(config, node, id, reason) {
-  assertNode(config, node);
-  const p = layout(config.home);
-  const activePath = join(p.active(node), `${id}.plan.json`);
-  if (!existsSync(activePath)) throw new Error(`Task not active: ${id}`);
-  const task = readJson(activePath);
-  const failedPath = join(p.failed(node), `${id}.plan.json`);
-  task.status = 'failed';
-  task.failedAt = new Date().toISOString();
-  const result = {
-    taskId: id,
-    from: node,
-    to: task.replyTo,
-    status: 'failed',
-    completedAt: task.failedAt,
-    summary: reason,
-    artifacts: { dir: p.artifacts(id), files: [] },
-    blockers: [reason],
-  };
-  task.result = result;
-  atomicWriteJson(failedPath, task);
-  if (existsSync(activePath)) unlinkSync(activePath);
-  return writeResult(config, task, result);
-}
-
-export function pullInbox(config, node) {
-  assertNode(config, node);
-  const p = layout(config.home);
-  const dir = p.inbox(node);
-  if (!existsSync(dir)) return [];
-  return readdirSync(dir)
-    .filter((f) => f.endsWith('.result.json'))
-    .map((f) => readJson(join(dir, f)))
-    .sort((a, b) => (a.completedAt < b.completedAt ? 1 : -1));
-}
-
 export function status(config) {
   ensureLayout(config.home);
   const p = layout(config.home);
@@ -221,14 +170,8 @@ export function status(config) {
     counts[node] = {};
     for (const st of ['pending', 'active', 'done', 'failed']) {
       const dir = join(p.tasks, st, node);
-      counts[node][st] = existsSync(dir)
-        ? readdirSync(dir).filter((f) => f.endsWith('.plan.json')).length
-        : 0;
+      counts[node][st] = existsSync(dir) ? listTaskFiles(dir).length : 0;
     }
-    const inboxDir = p.inbox(node);
-    counts[node].inbox = existsSync(inboxDir)
-      ? readdirSync(inboxDir).filter((f) => f.endsWith('.result.json')).length
-      : 0;
   }
   return { home: p.home, nodeId: config.nodeId, counts };
 }

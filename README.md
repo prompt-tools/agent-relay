@@ -1,54 +1,70 @@
 # agent-relay
 
-跨 IDE / 跨 CLI / 跨 Agent 的轻量任务中继系统。
-
-**目标**：配置简单，让 Cursor（CC）把计划派给 Hermes 等执行方，执行完成后把产物回传给 CC——不依赖 Ruflo 联邦 Hub。
+本机 Agent 任务邮政局：**发 → 自动唤醒执行方 → 再发回来**。
 
 ## 典型流程
 
 ```
-Cursor (计划)  →  dispatch send hermes  →  pending/
-Hermes (执行)  →  dispatch complete     →  done/ + artifacts/
-Cursor (汇总)  →  dispatch pull cursor  →  读取产物继续
+Cursor  relay send codex     →  pending/codex/
+relayd  claim + spawn codex  →  codex exec ...
+codex   relay send cursor    →  pending/cursor/ (type=result)
+Cursor  relay receive cursor →  读取结果
 ```
-
-## 文档
-
-| 文件 | 内容 |
-|------|------|
-| [docs/VISION.md](docs/VISION.md) | 问题、目标、非目标 |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | 组件、数据流、与现有栈关系 |
-| [docs/TASK-SCHEMA.md](docs/TASK-SCHEMA.md) | 任务信封 JSON 约定 |
-| [docs/ROADMAP.md](docs/ROADMAP.md) | 分阶段实现计划 |
 
 ## 快速开始
 
 ```bash
 cd ~/Projects/agent-relay
-node bin/relay.js init --as cursor
-node bin/relay.js send hermes --from cursor --title "示例" --plan-text "## 步骤\n1. ..."
-# Hermes 侧：claim → complete
-node bin/relay.js claim hermes
-node bin/relay.js complete hermes <taskId> --summary "完成"
-# Cursor 收结果
-node bin/relay.js pull cursor
+npm test
+
+# 一次性配置
+node bin/relay.js setup --role both --node cursor
+# 或分拆：发送方 --role sender，接收方 --role receiver --node codex
+
+# 发送任务
+node bin/relay.js send codex --from cursor --project ~/Projects/foo \
+  --title "示例" --plan-text "## 步骤\n1. ..."
+
+# 收取回传
+node bin/relay.js receive cursor --type result
 ```
+
+## MCP（Cursor）
+
+`relay setup` 会合并 `~/.cursor/mcp.json`。也可手动添加：
+
+```json
+{
+  "mcpServers": {
+    "agent-relay": {
+      "command": "node",
+      "args": ["/path/to/agent-relay/mcp/server.mjs"]
+    }
+  }
+}
+```
+
+工具：`relay_send`、`relay_receive`
+
+## 文档
+
+| 文件 | 内容 |
+|------|------|
+| [docs/PRINCIPLES.md](docs/PRINCIPLES.md) | 不可丢原则 |
+| [docs/FOCUS.md](docs/FOCUS.md) | v1 范围 |
+| [docs/E2E.md](docs/E2E.md) | E2E 流程与成功标准 |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | 组件与数据流 |
+| [docs/TASK-SCHEMA.md](docs/TASK-SCHEMA.md) | 任务信封 |
 
 ## 可靠性
 
-- 原子写盘 + rename 认领，防双占、防半截 JSON
-- 零 Docker / 零联邦 peer，**单目录 `~/.agent-relay` 跨 IDE/CLI 共用**
+- 原子写盘 + rename claim
+- relayd 单实例 + 去重
 - 详见 [docs/RELIABILITY.md](docs/RELIABILITY.md)
 
 ## 状态
 
-**Phase 1（当前）**：CLI 核心可用，MCP / 飞书后续。
-
-## 与本机环境
-
-- 任务根目录默认：`~/.agent-relay/`（可 `AGENT_RELAY_HOME` 覆盖）
-- 与 `~/.claude-flow/` 共享记忆可并存，不替代 ruflo memory
-- 节点名：`cursor` | `codex` | `hermes` | `antigravity`
+**v1**：协议、relayd、setup、MCP 已实现；E2E 需本机 codex CLI 实测。
 
 ## License
 

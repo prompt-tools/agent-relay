@@ -17,12 +17,14 @@ export function layout(home) {
   return {
     home: h,
     config: join(h, 'config.json'),
+    nodes: join(h, 'nodes.yaml'),
+    relaydPid: join(h, 'relayd.pid'),
+    relaydProcessed: join(h, 'relayd.processed.json'),
     tasks: join(h, 'tasks'),
     pending: (node) => join(h, 'tasks', 'pending', node),
     active: (node) => join(h, 'tasks', 'active', node),
     done: (node) => join(h, 'tasks', 'done', node),
     failed: (node) => join(h, 'tasks', 'failed', node),
-    inbox: (node) => join(h, 'inbox', node),
     artifacts: (id) => join(h, 'artifacts', id),
     log: join(h, 'relay.log'),
   };
@@ -37,7 +39,6 @@ export function ensureLayout(home) {
     join(p.tasks, 'active'),
     join(p.tasks, 'done'),
     join(p.tasks, 'failed'),
-    join(p.home, 'inbox'),
     join(p.home, 'artifacts'),
   ]) {
     if (!existsSync(dir)) mkdirSync(dir, { recursive: true, mode: 0o700 });
@@ -47,8 +48,6 @@ export function ensureLayout(home) {
       const d = join(p.tasks, sub, node);
       if (!existsSync(d)) mkdirSync(d, { recursive: true, mode: 0o700 });
     }
-    const inbox = join(p.home, 'inbox', node);
-    if (!existsSync(inbox)) mkdirSync(inbox, { recursive: true, mode: 0o700 });
   }
   return p;
 }
