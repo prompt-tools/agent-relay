@@ -23,6 +23,14 @@ alwaysApply: true
 - 测试: `npm test` 必须通过再声称完成
 - 多步任务: writing-plans → subagent-driven-development
 
+## 上下文 >75%（或出现 summary / 跨 Phase）
+
+1. 更新 `docs/MEMORY.md` + `docs/WORKLOG.md`（只写新增，引用路径不贴全文）
+2. 有意义改动则 commit
+3. 停止重读 transcript；以 MEMORY/WORKLOG/ROADMAP 为真源
+4. 会话过长 → `handoff` 技能写交接 + 建议技能
+5. 回复精简，大段代码用 citation 不重复粘贴
+
 ## 禁止
 
 Ruflo 联邦、四 IDE 全家桶 setup、恢复 pull/complete、无测试的「做完了」。

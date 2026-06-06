@@ -32,6 +32,25 @@
 2. `subagent-driven-development` 执行
 3. `verification-before-completion` 再声称完成
 
+## 上下文预算（>75% 时自动执行）
+
+无法精确读取消耗百分比时，用以下**代理信号**判断「该精简了」：
+
+- 系统注入了 conversation summary（上下文已被压缩过）
+- 同一任务已跨很多轮，且大量 tool 输出仍在记忆里
+- 刚完成一个 Phase / 大 feature，即将开始新主题
+- 重复读取 transcript、全文件或长 diff 才能继续
+
+**精简协议**（按顺序，不要跳步）：
+
+1. **落盘** — 只把*新*决策/踩坑写入 `docs/MEMORY.md`，进展写入 `docs/WORKLOG.md`；不重复已有 plan/ADR 全文，用路径引用
+2. **提交** — 若有未提交的有意义改动，先 commit（用户已授权自主推进时）
+3. **收窄注意力** — 之后优先读 `MEMORY` / `WORKLOG` / `ROADMAP` / 相关 plan，**禁止**再扫完整 transcript 或批量重读已定论文件
+4. **交接** — 若 summary 已发生或会话明显过长：用 `handoff` 技能写一份短交接（存 OS 临时目录），列出「下一步 + 建议技能」
+5. **表达** — 对用户回复保持简短；代码用 `startLine:endLine:path` 引用，不粘贴大段已有内容
+
+**不要**用 `caveman` 做上下文管理（那是沟通风格，不是记忆整理）。
+
 ## 不要
 
 - 恢复 inbox/pull/complete

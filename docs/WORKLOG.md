@@ -80,6 +80,16 @@
 
 ---
 
+## 2026-06-07 — 上下文预算协议
+
+**完成**：
+- `AGENTS.md` + `.cursor/rules/agent-relay.mdc` — 上下文 >75% 时自动落盘/收窄/handoff
+- `docs/MEMORY.md` 记录用户决策
+
+**触发信号**：conversation summary、跨 Phase、重复扫 transcript
+
+---
+
 ## 决策日志
 
 | 日期 | 决策 | 原因 |

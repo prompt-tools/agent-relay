@@ -19,6 +19,7 @@ All notable changes to agent-relay. Format based on [Keep a Changelog](https://k
 - Failure retry (`relayd.retries.json`, max 3 attempts)
 - `relay recover` CLI and `src/recover.mjs`
 - `stuckActive` in health report
+- Context budget protocol in `AGENTS.md` and Cursor rules (auto compact when context is full)
 - `relay health` and `relay status --health` diagnostics
 - `scripts/auth.mjs` — role-based OAuth checks (`hermes login`, etc.)
 - Interactive `relay setup` with readline prompts
