@@ -93,4 +93,4 @@
 - [x] 失败重试 + `relay recover`
 - [ ] setup TUI / 图形化
 - [ ] `type:progress` 可观测
-- [ ] GitHub `v0.2.0` 发布
+- [x] GitHub `v0.2.0` 发布

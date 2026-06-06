@@ -4,6 +4,8 @@ All notable changes to agent-relay. Format based on [Keep a Changelog](https://k
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-06-07
+
 ### Fixed
 
 - launchd `spawn hermes ENOENT` — store absolute binary paths in `nodes.yaml`, inject PATH in plist
@@ -49,5 +51,6 @@ All notable changes to agent-relay. Format based on [Keep a Changelog](https://k
 - Task files: `{id}.json` (was `{id}.plan.json`)
 - Docs aligned to PRINCIPLES.md / Hermes primary path
 
-[Unreleased]: https://github.com/prompt-tools/agent-relay/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/prompt-tools/agent-relay/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/prompt-tools/agent-relay/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/prompt-tools/agent-relay/releases/tag/v0.1.0
