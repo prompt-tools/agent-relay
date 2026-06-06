@@ -3,9 +3,13 @@ import { join, dirname, resolve } from 'node:path';
 import { homedir } from 'node:os';
 import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import readline from 'node:readline/promises';
+import { stdin as input, stdout as output } from 'node:process';
 import { initConfig } from '../src/config.mjs';
 import { setNode } from '../src/nodes.mjs';
 import { resolveHome } from '../src/paths.mjs';
+import { runAuthSequence } from './auth.mjs';
+import { loadLaunchd } from './launchd.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '..');
@@ -118,25 +122,47 @@ export function configureNodes(home, { role, nodeId, detected }) {
   return results;
 }
 
-export function runSetup(options = {}) {
-  const {
-    home = resolveHome(process.env.AGENT_RELAY_HOME),
-    role = options.role || 'both',
-    nodeId = options.nodeId || 'cursor',
-    mergeMcp = role !== 'receiver',
-    installLaunchd = role !== 'sender',
-    mcpConfigPath = join(homedir(), '.cursor', 'mcp.json'),
-    relayMcpPath = join(REPO_ROOT, 'mcp', 'server.mjs'),
-    relaydPath = join(REPO_ROOT, 'bin', 'relayd.js'),
-    launchAgentsDir,
-    dryRun = false,
-  } = options;
+export async function promptInteractive({ role, nodeId, detected }) {
+  if (!input.isTTY) return { role, nodeId };
+  const rl = readline.createInterface({ input, output });
+  try {
+    output.write('\nagent-relay setup\n');
+    const roleAns = (await rl.question(`Role [sender/receiver/both] (${role}): `)).trim();
+    const nodeAns = (await rl.question(`Node id (${nodeId}): `)).trim();
+    if (detected.length) {
+      output.write(`Detected CLIs: ${detected.map((d) => d.key).join(', ')}\n`);
+    }
+    return {
+      role: roleAns || role,
+      nodeId: nodeAns || nodeId,
+    };
+  } finally {
+    rl.close();
+  }
+}
+
+export async function runSetup(options = {}) {
+  const detected = detectClis();
+  let role = options.role || 'both';
+  let nodeId = options.nodeId || 'cursor';
+
+  const interactive = options.interactive ?? (input.isTTY && !options.nonInteractive && !options.role);
+  if (interactive) {
+    ({ role, nodeId } = await promptInteractive({ role, nodeId, detected }));
+  }
+
+  const home = options.home ?? resolveHome(process.env.AGENT_RELAY_HOME);
+  const mergeMcp = options.mergeMcp ?? role !== 'receiver';
+  const installLaunchd = options.installLaunchd ?? role !== 'sender';
+  const mcpConfigPath = options.mcpConfigPath ?? join(homedir(), '.cursor', 'mcp.json');
+  const relayMcpPath = options.relayMcpPath ?? join(REPO_ROOT, 'mcp', 'server.mjs');
+  const relaydPath = options.relaydPath ?? join(REPO_ROOT, 'bin', 'relayd.js');
+  const { launchAgentsDir, dryRun = false, skipAuth = false, loadLaunchd: shouldLoad = true } = options;
 
   if (!['sender', 'receiver', 'both'].includes(role)) {
     throw new Error(`Invalid role: ${role}`);
   }
 
-  const detected = detectClis();
   const steps = [];
 
   if (!dryRun) {
@@ -144,14 +170,31 @@ export function runSetup(options = {}) {
     const nodes = configureNodes(home, { role, nodeId, detected });
     steps.push({ step: 'nodes', nodes });
 
+    const auth = runAuthSequence({
+      role,
+      nodeId,
+      detected,
+      interactive: interactive && !skipAuth,
+      skipAuth,
+    });
+    steps.push(...auth.steps);
+
     if (mergeMcp) {
       const mcpPath = mergeMcpConfig(mcpConfigPath, relayMcpPath);
-      steps.push({ step: 'mcp', path: mcpPath });
+      steps.push({ step: 'mcp', path: mcpPath, note: 'Restart Cursor to load MCP' });
     }
 
     if (installLaunchd) {
       const plist = writeLaunchdPlist(home, relaydPath, { launchAgentsDir });
-      steps.push({ step: 'launchd', path: plist });
+      steps.push({ step: 'launchd-write', path: plist });
+      if (shouldLoad) {
+        try {
+          const loaded = loadLaunchd(plist);
+          steps.push({ step: 'launchd-load', ...loaded });
+        } catch (err) {
+          steps.push({ step: 'launchd-load', ok: false, error: err.message });
+        }
+      }
     }
   } else {
     steps.push({ step: 'dry-run', role, nodeId, detected: detected.map((d) => d.key) });

@@ -50,11 +50,16 @@ node bin/relay.js receive cursor --type result
 
 | 文件 | 内容 |
 |------|------|
+| [AGENTS.md](AGENTS.md) | AI Agent 工作指引 |
 | [docs/PRINCIPLES.md](docs/PRINCIPLES.md) | 不可丢原则 |
+| [docs/MEMORY.md](docs/MEMORY.md) | 项目记忆与踩坑 |
+| [docs/WORKLOG.md](docs/WORKLOG.md) | 开发工作记录 |
 | [docs/FOCUS.md](docs/FOCUS.md) | v1 范围 |
-| [docs/E2E.md](docs/E2E.md) | E2E 流程与成功标准 |
+| [docs/SETUP.md](docs/SETUP.md) | 安装与 OAuth |
+| [docs/E2E.md](docs/E2E.md) | E2E 流程（cursor→hermes） |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | 组件与数据流 |
-| [docs/TASK-SCHEMA.md](docs/TASK-SCHEMA.md) | 任务信封 |
+| [CHANGELOG.md](CHANGELOG.md) | 版本变更 |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | 贡献指南 |
 
 ## 可靠性
 

@@ -72,10 +72,10 @@ test('configureNodes receiver picks detected provider', () => {
   }
 });
 
-test('runSetup dry-run does not write nodes', () => {
+test('runSetup dry-run does not write nodes', async () => {
   const home = mkdtempSync(join(tmpdir(), 'agent-relay-setup-'));
   try {
-    const result = runSetup({ home, role: 'both', nodeId: 'cursor', dryRun: true });
+    const result = await runSetup({ home, role: 'both', nodeId: 'cursor', dryRun: true, nonInteractive: true });
     assert.equal(result.ok, true);
     assert.equal(result.steps[0].step, 'dry-run');
     assert.equal(existsSync(join(home, 'nodes.yaml')), false);
@@ -84,17 +84,19 @@ test('runSetup dry-run does not write nodes', () => {
   }
 });
 
-test('runSetup receiver writes nodes and launchd', () => {
+test('runSetup receiver writes nodes and launchd', async () => {
   const home = mkdtempSync(join(tmpdir(), 'agent-relay-setup-'));
   const la = mkdtempSync(join(tmpdir(), 'agent-relay-la-'));
   try {
-    const result = runSetup({
+    const result = await runSetup({
       home,
       role: 'receiver',
       nodeId: 'codex',
       mergeMcp: false,
-      detectedOverride: [],
       launchAgentsDir: la,
+      nonInteractive: true,
+      skipAuth: true,
+      loadLaunchd: false,
     });
     assert.equal(result.ok, true);
     assert.ok(existsSync(join(home, 'config.json')));

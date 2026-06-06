@@ -23,7 +23,7 @@
 3. **relayd**：单实例 + 去重；见 pending → 按 `nodes.yaml` spawn provider；prompt 含 taskId +「做完 send 回 `<from>`」
 4. **relay setup**：角色选择 → 检测 CLI → 顺序 OAuth → 写 `nodes.yaml` → 合并 Cursor MCP → 装 launchd
 5. **MCP**：`relay_send`、`relay_receive`（stdio，与 CLI 同构）
-6. **先打通一条线**：建议 `cursor → codex` 或 `cursor → hermes`（一个 provider 跑通 E2E）
+6. **先打通一条线**：**cursor → hermes**（已实测 E2E）
 7. **文档**：PRINCIPLES.md 为准；VISION.md 待对齐（唤醒改为核心）
 
 ## v1 不做

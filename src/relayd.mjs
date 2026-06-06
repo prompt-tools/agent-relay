@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, existsSync, unlinkSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, unlinkSync, appendFileSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -15,6 +15,14 @@ const PROVIDERS = {
   'codex-exec': buildCodexSpawn,
   'hermes-cli': buildHermesSpawn,
 };
+
+function relayLog(home, entry) {
+  const logPath = layout(home).log;
+  appendFileSync(logPath, JSON.stringify({ ts: new Date().toISOString(), ...entry }) + '\n', {
+    flag: 'a',
+    mode: 0o600,
+  });
+}
 
 export function loadProcessed(home) {
   const p = layout(home).relaydProcessed;
@@ -84,6 +92,7 @@ export function tick(home, { spawnFn = spawn } = {}) {
       saveProcessed(home, processed);
       results.push({ id: task.id, ...wake });
     } catch (err) {
+      relayLog(home, { op: 'relayd_error', id: task.id, error: err.message });
       results.push({ id: task.id, woke: false, reason: err.message });
     }
   }

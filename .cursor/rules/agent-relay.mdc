@@ -1,0 +1,28 @@
+---
+description: agent-relay 项目原则、范围与开发流程
+alwaysApply: true
+---
+
+# agent-relay
+
+## 必读
+
+- `docs/PRINCIPLES.md`, `docs/FOCUS.md`, `docs/MEMORY.md`
+
+## 协议
+
+仅 **send** + **receive**（含 claim）。回传 = 再次 send（`type: result|failed|progress`）。无 inbox。
+
+## 主路径
+
+**cursor → hermes** E2E。默认不用 codex（用户无额度）。
+
+## 代码
+
+- Provider: `src/providers/` + 注册 `relayd.mjs`
+- 测试: `npm test` 必须通过再声称完成
+- 多步任务: writing-plans → subagent-driven-development
+
+## 禁止
+
+Ruflo 联邦、四 IDE 全家桶 setup、恢复 pull/complete、无测试的「做完了」。

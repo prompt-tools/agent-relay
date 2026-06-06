@@ -1,18 +1,30 @@
-# E2E：cursor → codex → cursor
+# E2E：cursor → hermes → cursor
 
-v1 成功标准：**一条 send，无需手动开 Codex IDE，结果回到 `pending/cursor/`。**
+v1 主路径（已实测）。成功标准：**一条 send，无需开 Hermes IDE，结果回到 `pending/cursor/`。**
 
 ## 前置
 
 ```bash
-# 接收方（本机 Codex）
-relay setup --role receiver --node codex
+# 接收方
+relay setup --role receiver --node hermes --yes
 
 # 发送方（Cursor）
-relay setup --role sender --node cursor
+relay setup --role sender --node cursor --yes
+# 合并 MCP 后重启 Cursor
+```
 
-# 启动 daemon（setup 会写 launchd；也可手动）
-relayd
+## 项目路由（可选）
+
+在仓库根目录放 `.agent-relay/project.yaml`：
+
+```json
+{ "defaultTo": "hermes", "defaultFrom": "cursor" }
+```
+
+之后可省略 `send` 的目标节点：
+
+```bash
+relay send --project . --title "任务" --plan-text "## 步骤\n..."
 ```
 
 ## 流程
@@ -22,41 +34,41 @@ sequenceDiagram
   participant CC as Cursor
   participant FS as ~/.agent-relay
   participant RD as relayd
-  participant CX as codex CLI
+  participant H as hermes CLI
 
-  CC->>FS: relay send codex (type=plan)
+  CC->>FS: relay send hermes (type=plan)
   RD->>FS: tick: claim plan
-  RD->>CX: spawn codex exec
-  CX->>CX: 执行任务
-  CX->>FS: relay send cursor (type=result)
+  RD->>H: hermes chat -q ...
+  H->>H: 执行任务
+  H->>FS: relay send cursor (type=result)
   CC->>FS: relay receive cursor --type result
 ```
 
-## 手动验证步骤
+## 手动验证
 
 ```bash
-# 1. 发送计划
-relay send codex --from cursor --project ~/Projects/foo \
-  --title "Fix login" --plan-text "## 步骤\n1. 修测试"
+relay send hermes --from cursor --project ~/Projects/foo \
+  --title "Fix login" --plan-text "## 步骤\n1. ..."
 
-# 2. relayd 应 claim 并 spawn codex（需本机有 codex CLI）
-relay status
+relay status   # hermes active 应有 1
 
-# 3. 模拟回传（无 codex 时手动测链路）
-relay send cursor --from codex --project ~/Projects/foo \
-  --type result --task-id <上一步id> \
-  --title Done --body '{"summary":"ok"}'
-
-# 4. 发送方收取
 relay receive cursor --type result
 ```
 
+## 失败诊断
+
+| 症状 | 查看 |
+|------|------|
+| relayd 没唤醒 | `~/.agent-relay/relayd.stderr.log` |
+| tick 异常 | `~/.agent-relay/relay.log` 搜 `relayd_error` |
+| Hermes 未回传 | Hermes 是否配好 API key：`hermes status` |
+| MCP 不工作 | 重启 Cursor；检查 `~/.cursor/mcp.json` |
+
 ## 成功标准 Checklist
 
-- [ ] `relay send` 写入 `~/.agent-relay/tasks/pending/codex/<id>.json`
-- [ ] `relayd` 单实例运行（`relayd.pid` 存在）
-- [ ] plan 被 claim 到 `active/codex/`
-- [ ] codex provider spawn 命令含 `relay send cursor --type result`
-- [ ] 回传出现在 `pending/cursor/`，`type=result`
-- [ ] Cursor MCP `relay_receive` 能列出该任务
+- [ ] `relay send` → `pending/hermes/<id>.json`
+- [ ] `relayd` 运行（launchd 或手动 `relayd`）
+- [ ] plan → `active/hermes/`
+- [ ] Hermes spawn 含 `relay send cursor --type result`
+- [ ] 回传在 `pending/cursor/`，`type=result`
 - [ ] `npm test` 全绿

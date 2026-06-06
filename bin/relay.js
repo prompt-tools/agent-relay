@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { readFileSync } from 'node:fs';
 import { initConfig, loadConfig } from '../src/config.mjs';
+import { resolveSendTarget } from '../src/project.mjs';
 import {
   sendTask,
   listTasks,
@@ -26,7 +27,7 @@ Usage:
   relay claim <node> [taskId]
   relay show <taskId>
   relay status
-  relay setup [--role sender|receiver|both] [--node <nodeId>] [--dry-run]
+  relay setup [--role sender|receiver|both] [--node <nodeId>] [--dry-run] [--skip-auth]
 
 Deprecated (use send/receive instead):
   relay pull, relay complete, relay fail
@@ -72,13 +73,16 @@ async function run() {
 
   if (cmd === 'setup') {
     const { runSetup } = await import('../scripts/setup.mjs');
-    const result = runSetup({
+    const result = await runSetup({
       home,
-      role: flag('--role') || 'both',
-      nodeId: flag('--node') || 'cursor',
+      role: flag('--role'),
+      nodeId: flag('--node'),
       dryRun: args.includes('--dry-run'),
       mergeMcp: !args.includes('--no-mcp'),
       installLaunchd: !args.includes('--no-launchd'),
+      skipAuth: args.includes('--skip-auth'),
+      nonInteractive: args.includes('--yes'),
+      loadLaunchd: !args.includes('--no-launchd-load'),
     });
     console.log(JSON.stringify(result, null, 2));
     return;
@@ -92,10 +96,14 @@ async function run() {
   const config = loadConfig(home);
 
   if (cmd === 'send') {
-    const to = args[1];
+    const projectPath = flag('--project');
+    let to = args[1];
+    if (!to || to.startsWith('--')) {
+      to = resolveSendTarget({ projectPath });
+      if (!to) throw new Error('<to> or --project with .agent-relay/project.yaml defaultTo required');
+    }
     const from = flag('--from') || config.nodeId;
     const title = flag('--title') || 'Task';
-    const projectPath = flag('--project');
     const type = flag('--type') || 'plan';
     const taskId = flag('--task-id');
     const bodyJson = flag('--body');
