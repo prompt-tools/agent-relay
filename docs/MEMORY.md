@@ -44,6 +44,16 @@
 - **修复**：`nodes.yaml` 存 **绝对路径**；launchd plist 注入 `PATH`。
 - spawn 必须监听 `error` 事件，否则 relayd 会崩。
 
+### 失败重试与 processed 竞态
+
+- `tick` 在 spawn 拿到 pid 后立即写 `processed`；异步 `error` 事件会触发 `handleWakeFailure`。
+- **必须**在 recover 后从 `processed` 删除 taskId，否则任务永久跳过。
+- `recoverTask` 移动文件后须 **回写 JSON**（清 `claimedAt`、设 `status: pending`）。
+
+### relay send 指令须 shell 引号
+
+- `relaySendInstruction` 中 `home`、`relayBin`、`from`、`task-id`、`projectPath` 用单引号包裹，避免空格路径或 shell 元字符破坏命令。
+
 ### 工具调用会超时
 
 - 长轮询 / MCP move 可能被中断；**直接写文件**比反复 Shell 更稳。
@@ -72,7 +82,9 @@
 
 ## 下一步（v1.1+）
 
-- [ ] 真机 `~/.agent-relay` 长期跑 relayd
-- [ ] `cursor-agent` provider（反向 hermes→cursor 若需要）
-- [ ] 失败重试 / 进度 `type:progress` 面板
-- [ ] GitHub 发布 + issue 模板
+- [x] 真机 `~/.agent-relay` 长期跑 relayd
+- [x] `cursor-agent` provider
+- [x] 失败重试 + `relay recover`
+- [ ] setup TUI / 图形化
+- [ ] `type:progress` 可观测
+- [ ] GitHub `v0.2.0` 发布

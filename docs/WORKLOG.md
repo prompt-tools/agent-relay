@@ -64,6 +64,22 @@
 
 ---
 
+## 2026-06-07 — Phase 2：provider + 重试 + recover
+
+**完成**：
+- `src/providers/cursor.mjs` — `agent --workspace --print --force --approve-mcps`
+- `relayd` 失败重试：`relayd.retries.json`，最多 3 次；spawn 成功才写 processed
+- `handleWakeFailure` — recover + 清除 processed（修复竞态卡死）
+- `src/recover.mjs` + `relay recover` CLI
+- `relaySendInstruction` shell 引号（空格路径安全）
+- 代码审查修复：`recoverTask` 回写磁盘、`recover --older-than` remaining 计数
+
+**测试**：32/32 pass
+
+**提交**：Phase 2 批次（见 git log）
+
+---
+
 ## 决策日志
 
 | 日期 | 决策 | 原因 |

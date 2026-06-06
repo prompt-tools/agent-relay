@@ -8,9 +8,17 @@ All notable changes to agent-relay. Format based on [Keep a Changelog](https://k
 
 - launchd `spawn hermes ENOENT` — store absolute binary paths in `nodes.yaml`, inject PATH in plist
 - relayd spawn errors no longer crash daemon (`child.on('error')`)
+- `handleWakeFailure` clears `processed` so async spawn errors can retry
+- `recoverTask` writes updated task JSON to disk after move
+- `relay recover --older-than` `remaining` count uses same threshold
+- `relaySendInstruction` shell-quotes paths and node ids
 
 ### Added
 
+- `cursor-agent` provider (`agent --workspace --print`)
+- Failure retry (`relayd.retries.json`, max 3 attempts)
+- `relay recover` CLI and `src/recover.mjs`
+- `stuckActive` in health report
 - `relay health` and `relay status --health` diagnostics
 - `scripts/auth.mjs` — role-based OAuth checks (`hermes login`, etc.)
 - Interactive `relay setup` with readline prompts

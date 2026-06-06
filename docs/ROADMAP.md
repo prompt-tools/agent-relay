@@ -21,10 +21,12 @@
 
 ## Phase 2 — 体验加固
 
-- [ ] cursor-agent provider（反向唤醒）
-- [ ] 失败自动重试 / `type:progress` 可观测
+- [x] cursor-agent provider（反向唤醒）
+- [x] 失败自动重试（`relayd.retries.json` + `handleWakeFailure`）
+- [x] `relay recover` — 卡住任务回 pending
+- [x] `relay health` / `relay status --health` 一键诊断（含 `stuckActive`）
 - [ ] setup 图形化或 TUI
-- [x] `relay health` / `relay status --health` 一键诊断
+- [ ] `type:progress` 可观测面板
 
 ## Phase 3 — 可选扩展
 

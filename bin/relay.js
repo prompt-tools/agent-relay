@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { initConfig, loadConfig } from '../src/config.mjs';
 import { resolveSendTarget } from '../src/project.mjs';
 import { healthReport } from '../src/health.mjs';
+import { recoverTask, recoverAllStuck, listStuckActive } from '../src/recover.mjs';
 import {
   sendTask,
   listTasks,
@@ -29,6 +30,7 @@ Usage:
   relay show <taskId>
   relay status [--health]
   relay health
+  relay recover <node> [--task-id <id>] [--older-than <sec>]
   relay setup [--role sender|receiver|both] [--node <nodeId>] [--dry-run] [--skip-auth]
 
 Deprecated (use send/receive instead):
@@ -166,6 +168,21 @@ async function run() {
 
   if (cmd === 'show') {
     console.log(JSON.stringify(showTask(config, args[1]), null, 2));
+    return;
+  }
+
+  if (cmd === 'recover') {
+    const node = args[1] || config.nodeId;
+    const taskId = flag('--task-id');
+    const olderThanSec = Number(flag('--older-than') || 0);
+    if (taskId) {
+      console.log(JSON.stringify({ ok: true, task: recoverTask(config, node, taskId) }, null, 2));
+      return;
+    }
+    const olderThanMs = olderThanSec * 1000;
+    const recovered = recoverAllStuck(config, node, { olderThanMs });
+    const stuck = listStuckActive(config, node, { olderThanMs });
+    console.log(JSON.stringify({ ok: true, recovered, remaining: stuck.length }, null, 2));
     return;
   }
 

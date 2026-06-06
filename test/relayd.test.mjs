@@ -4,9 +4,16 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { initConfig } from '../src/config.mjs';
-import { sendTask } from '../src/store.mjs';
+import { sendTask, claimTask, receiveTasks } from '../src/store.mjs';
 import { setNode } from '../src/nodes.mjs';
-import { buildSpawnForTask, loadProcessed, saveProcessed, tick } from '../src/relayd.mjs';
+import {
+  buildSpawnForTask,
+  loadProcessed,
+  saveProcessed,
+  tick,
+  handleWakeFailure,
+  loadRetries,
+} from '../src/relayd.mjs';
 import { buildCodexSpawn } from '../src/providers/codex.mjs';
 import { buildHermesSpawn } from '../src/providers/hermes.mjs';
 
@@ -18,8 +25,8 @@ test('buildCodexSpawn includes relay send tail', () => {
     CTX,
   );
   assert.equal(spec.cmd, 'codex');
-  assert.ok(spec.args.join(' ').includes('send cursor'));
-  assert.ok(spec.args.join(' ').includes('--task-id t1'));
+  assert.ok(spec.args.join(' ').includes("send 'cursor'"));
+  assert.ok(spec.args.join(' ').includes("--task-id 't1'"));
 });
 
 test('buildHermesSpawn uses hermes chat -q', () => {
@@ -30,8 +37,8 @@ test('buildHermesSpawn uses hermes chat -q', () => {
   assert.equal(spec.cmd, 'hermes');
   assert.equal(spec.args[0], 'chat');
   assert.equal(spec.args[1], '-q');
-  assert.ok(spec.args[2].includes('send cursor'));
-  assert.ok(spec.args[2].includes('--task-id t2'));
+  assert.ok(spec.args[2].includes("send 'cursor'"));
+  assert.ok(spec.args[2].includes("--task-id 't2'"));
   assert.ok(spec.args.includes('-Q'));
   assert.ok(spec.args.includes('--yolo'));
 });
@@ -92,6 +99,71 @@ test('processed set persists', () => {
     saveProcessed(home, s);
     const loaded = loadProcessed(home);
     assert.deepEqual([...loaded].sort(), ['a', 'b']);
+  } finally {
+    rmSync(home, { recursive: true, force: true });
+  }
+});
+
+test('buildSpawnForTask returns cursor-agent spec', () => {
+  const home = mkdtempSync(join(tmpdir(), 'agent-relay-relayd-'));
+  try {
+    setNode(home, 'cursor', { provider: 'cursor-agent', binary: '/bin/agent' });
+    const spec = buildSpawnForTask(home, {
+      to: 'cursor',
+      id: '1',
+      from: 'hermes',
+      projectPath: '/x',
+      body: {},
+    });
+    assert.equal(spec.cmd, '/bin/agent');
+    assert.ok(spec.args.includes('--print'));
+  } finally {
+    rmSync(home, { recursive: true, force: true });
+  }
+});
+
+test('handleWakeFailure clears processed so task can retry', () => {
+  const home = mkdtempSync(join(tmpdir(), 'agent-relay-relayd-'));
+  try {
+    const config = initConfig(home, 'hermes');
+    const plan = sendTask(config, {
+      type: 'plan',
+      to: 'hermes',
+      from: 'cursor',
+      projectPath: '/tmp/p',
+      title: 'T3',
+      body: { markdown: 'z' },
+    });
+    const processed = new Set([plan.id]);
+    saveProcessed(home, processed);
+    claimTask(config, 'hermes', plan.id);
+    handleWakeFailure(home, config, 'hermes', plan.id, 'spawn error');
+    assert.equal(loadProcessed(home).has(plan.id), false);
+  } finally {
+    rmSync(home, { recursive: true, force: true });
+  }
+});
+
+test('handleWakeFailure increments retries and recovers', () => {
+  const home = mkdtempSync(join(tmpdir(), 'agent-relay-relayd-'));
+  try {
+    const config = initConfig(home, 'hermes');
+    setNode(home, 'hermes', { provider: 'hermes-cli', binary: 'hermes' });
+    const plan = sendTask(config, {
+      type: 'plan',
+      to: 'hermes',
+      from: 'cursor',
+      projectPath: '/tmp/p',
+      title: 'T2',
+      body: { markdown: 'y' },
+    });
+    claimTask(config, 'hermes', plan.id);
+    handleWakeFailure(home, config, 'hermes', plan.id, 'ENOENT');
+    const retries = loadRetries(home);
+    assert.equal(retries[plan.id], 1);
+    const pending = receiveTasks(config, 'hermes', 'pending');
+    assert.equal(pending.length, 1);
+    assert.equal(pending[0].id, plan.id);
   } finally {
     rmSync(home, { recursive: true, force: true });
   }

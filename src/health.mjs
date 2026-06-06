@@ -4,6 +4,7 @@ import { loadConfig } from './config.mjs';
 import { loadNodes } from './nodes.mjs';
 import { detectClis } from '../scripts/setup.mjs';
 import { isCliReady } from '../scripts/auth.mjs';
+import { listStuckActive } from './recover.mjs';
 
 export function checkRelayd(home) {
   const pidFile = layout(home).relaydPid;
@@ -46,12 +47,15 @@ export function healthReport(home) {
   const cliKey = detected.find((d) => d.nodeId === nodeId)?.key;
   const auth = cliKey ? isCliReady(cliKey) : { ready: false, reason: 'cli not detected' };
 
+  const stuck = listStuckActive(config, nodeId, { olderThanMs: 60_000 });
+
   const checks = {
     home: layout(home).home,
     nodeId,
     provider,
     relayd,
     cli: cliKey ? { key: cliKey, ...auth } : { ready: false, reason: 'no matching cli' },
+    stuckActive: stuck.map(({ task, age }) => ({ id: task.id, ageMs: age, title: task.title })),
     recentErrors: recentErrors(home),
   };
 

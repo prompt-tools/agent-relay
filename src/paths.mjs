@@ -20,6 +20,7 @@ export function layout(home) {
     nodes: join(h, 'nodes.yaml'),
     relaydPid: join(h, 'relayd.pid'),
     relaydProcessed: join(h, 'relayd.processed.json'),
+    relaydRetries: join(h, 'relayd.retries.json'),
     tasks: join(h, 'tasks'),
     pending: (node) => join(h, 'tasks', 'pending', node),
     active: (node) => join(h, 'tasks', 'active', node),
