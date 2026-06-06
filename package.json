@@ -1,0 +1,25 @@
+{
+  "name": "agent-relay",
+  "version": "0.0.0",
+  "description": "Lightweight cross-IDE agent task relay — plan in Cursor, execute in Hermes, artifacts back.",
+  "type": "module",
+  "bin": {
+    "relay": "./bin/relay.js"
+  },
+  "scripts": {
+    "relay": "node bin/relay.js",
+    "test": "node --test test/*.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT",
+  "keywords": [
+    "agent",
+    "cursor",
+    "hermes",
+    "codex",
+    "task-queue",
+    "mcp"
+  ]
+}
