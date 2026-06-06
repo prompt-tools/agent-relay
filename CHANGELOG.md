@@ -6,30 +6,20 @@ All notable changes to agent-relay. Format based on [Keep a Changelog](https://k
 
 ## [0.2.0] - 2026-06-07
 
-### Fixed
-
-- launchd `spawn hermes ENOENT` — store absolute binary paths in `nodes.yaml`, inject PATH in plist
-- relayd spawn errors no longer crash daemon (`child.on('error')`)
-- `handleWakeFailure` clears `processed` so async spawn errors can retry
-- `recoverTask` writes updated task JSON to disk after move
-- `relay recover --older-than` `remaining` count uses same threshold
-- `relaySendInstruction` shell-quotes paths and node ids
-
 ### Added
 
 - `cursor-agent` provider (`agent --workspace --print`)
 - Failure retry (`relayd.retries.json`, max 3 attempts)
 - `relay recover` CLI and `src/recover.mjs`
 - `stuckActive` in health report
-- Context budget protocol in `AGENTS.md` and Cursor rules (auto compact when context is full)
-- `relay health` and `relay status --health` diagnostics
-- `scripts/auth.mjs` — role-based OAuth checks (`hermes login`, etc.)
-- Interactive `relay setup` with readline prompts
-- `launchctl bootstrap` after writing launchd plist
-- `src/project.mjs` — `.agent-relay/project.yaml` default routing
-- `docs/SETUP.md`, `docs/MEMORY.md`, `docs/WORKLOG.md`, `AGENTS.md`
-- `.cursor/rules/agent-relay.mdc` for Cursor agents
-- relayd structured error logging to `relay.log`
+- Context budget protocol in `AGENTS.md` and Cursor rules
+
+### Fixed
+
+- `handleWakeFailure` clears `processed` so async spawn errors can retry
+- `recoverTask` writes updated task JSON to disk after move
+- `relay recover --older-than` `remaining` count uses same threshold
+- `relaySendInstruction` shell-quotes paths and node ids
 
 ## [0.1.0] - 2026-06-07
 
@@ -52,5 +42,5 @@ All notable changes to agent-relay. Format based on [Keep a Changelog](https://k
 - Docs aligned to PRINCIPLES.md / Hermes primary path
 
 [Unreleased]: https://github.com/prompt-tools/agent-relay/compare/v0.2.0...HEAD
-[0.2.0]: https://github.com/prompt-tools/agent-relay/compare/v0.1.0...v0.2.0
+[0.2.0]: https://github.com/prompt-tools/agent-relay/releases/tag/v0.2.0
 [0.1.0]: https://github.com/prompt-tools/agent-relay/releases/tag/v0.1.0
