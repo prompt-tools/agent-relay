@@ -1,13 +1,19 @@
 import { readFileSync, writeFileSync, existsSync, unlinkSync } from 'node:fs';
 import { spawn } from 'node:child_process';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { layout } from './paths.mjs';
 import { loadConfig } from './config.mjs';
 import { listTasks, claimTask } from './store.mjs';
 import { getProvider } from './nodes.mjs';
 import { buildCodexSpawn } from './providers/codex.mjs';
+import { buildHermesSpawn } from './providers/hermes.mjs';
+
+const RELAY_BIN = join(dirname(fileURLToPath(import.meta.url)), '..', 'bin', 'relay.js');
 
 const PROVIDERS = {
   'codex-exec': buildCodexSpawn,
+  'hermes-cli': buildHermesSpawn,
 };
 
 export function loadProcessed(home) {
@@ -46,7 +52,7 @@ export function buildSpawnForTask(home, task) {
   const provider = getProvider(home, task.to);
   const build = PROVIDERS[provider];
   if (!build) return null;
-  return build(task);
+  return build(task, { home, relayBin: RELAY_BIN });
 }
 
 export function wakeTask(home, task, { spawnFn = spawn } = {}) {
@@ -56,6 +62,7 @@ export function wakeTask(home, task, { spawnFn = spawn } = {}) {
     detached: true,
     stdio: 'ignore',
     cwd: task.projectPath,
+    env: { ...process.env, ...spec.env },
   });
   child.unref();
   return { woke: true, pid: child.pid, spec };
