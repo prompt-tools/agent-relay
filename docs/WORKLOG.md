@@ -100,11 +100,17 @@
 
 ---
 
-## 2026-06-07 — 约束绑定现有技能体系
+## 2026-06-07 — Phase 3 Task 1: antigravity-cli
 
-**完成**：
-- 重写 `AGENT-CONTRACT.md` — 映射 Superpowers / GSD / OMX / Cursor subagent，附技能路径速查
-- 不再重复造轮子；执行前 MUST Read 对应 SKILL.md
+**完成**（subagent 实现 + 双审查）：
+- `src/providers/antigravity.mjs` — `agy -p` + `--dangerously-skip-permissions`
+- 注册 `relayd.mjs`；tick 集成测试
+
+**测试**：50/50 pass
+
+---
+
+**决策**：用户卸载 GSD/OMX；`AGENT-CONTRACT.md` 只绑定 Superpowers 技能与 Cursor Subagent 类型。
 
 ---
 

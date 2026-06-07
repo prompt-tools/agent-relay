@@ -10,6 +10,7 @@ import { recoverTask } from './recover.mjs';
 import { buildCodexSpawn } from './providers/codex.mjs';
 import { buildHermesSpawn } from './providers/hermes.mjs';
 import { buildCursorSpawn } from './providers/cursor.mjs';
+import { buildAntigravitySpawn } from './providers/antigravity.mjs';
 
 const RELAY_BIN = join(dirname(fileURLToPath(import.meta.url)), '..', 'bin', 'relay.js');
 const MAX_RETRIES = 3;
@@ -18,6 +19,7 @@ const PROVIDERS = {
   'codex-exec': buildCodexSpawn,
   'hermes-cli': buildHermesSpawn,
   'cursor-agent': buildCursorSpawn,
+  'antigravity-cli': buildAntigravitySpawn,
 };
 
 function relayLog(home, entry) {

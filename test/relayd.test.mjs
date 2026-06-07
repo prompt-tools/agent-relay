@@ -66,6 +66,29 @@ test('tick claims hermes plan and wakes', () => {
   }
 });
 
+test('tick claims antigravity plan and wakes', () => {
+  const home = mkdtempSync(join(tmpdir(), 'agent-relay-relayd-'));
+  try {
+    const config = initConfig(home, 'antigravity');
+    setNode(home, 'antigravity', { provider: 'antigravity-cli', binary: 'agy' });
+    sendTask(config, {
+      type: 'plan',
+      to: 'antigravity',
+      from: 'cursor',
+      projectPath: '/tmp/p',
+      title: 'T',
+      body: { markdown: 'x' },
+    });
+    const fakeSpawn = () => ({ unref() {}, on() {}, pid: 999 });
+    const results = tick(home, { spawnFn: fakeSpawn });
+    assert.equal(results.length, 1);
+    assert.equal(results[0].woke, true);
+    assert.ok(results[0].spec.cmd.includes('agy'));
+  } finally {
+    rmSync(home, { recursive: true, force: true });
+  }
+});
+
 test('tick claims plan and records processed', () => {
   const home = mkdtempSync(join(tmpdir(), 'agent-relay-relayd-'));
   try {
@@ -117,6 +140,27 @@ test('buildSpawnForTask returns cursor-agent spec', () => {
     });
     assert.equal(spec.cmd, '/bin/agent');
     assert.ok(spec.args.includes('--print'));
+  } finally {
+    rmSync(home, { recursive: true, force: true });
+  }
+});
+
+test('buildSpawnForTask returns antigravity-cli spec', () => {
+  const home = mkdtempSync(join(tmpdir(), 'agent-relay-relayd-'));
+  try {
+    setNode(home, 'antigravity', { provider: 'antigravity-cli', binary: 'agy' });
+    const spec = buildSpawnForTask(home, {
+      to: 'antigravity',
+      id: 'ag1',
+      from: 'cursor',
+      projectPath: '/x',
+      body: { markdown: 'run it' },
+    });
+    assert.equal(spec.cmd, 'agy');
+    assert.equal(spec.args[0], '-p');
+    assert.ok(spec.args[1].includes('run it'));
+    assert.ok(spec.args[1].includes("send 'cursor'"));
+    assert.equal(spec.args[2], '--dangerously-skip-permissions');
   } finally {
     rmSync(home, { recursive: true, force: true });
   }

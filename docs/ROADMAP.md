@@ -31,7 +31,7 @@
 
 ## Phase 3 — 可选扩展
 
-- [ ] antigravity-cli provider
+- [x] antigravity-cli provider
 - [ ] `relay serve` 自托管 Web 面板
 - [ ] 跨机（git/rsync 队列同步）
 
