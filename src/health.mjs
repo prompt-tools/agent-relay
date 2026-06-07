@@ -2,8 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { layout } from './paths.mjs';
 import { loadConfig } from './config.mjs';
 import { loadNodes } from './nodes.mjs';
-import { detectClis } from '../scripts/setup.mjs';
-import { isCliReady } from '../scripts/auth.mjs';
+import { detectClis, isCliReady } from './detect.mjs';
 import { listStuckActive } from './recover.mjs';
 import { listOrphanPendingPlans } from './gc.mjs';
 

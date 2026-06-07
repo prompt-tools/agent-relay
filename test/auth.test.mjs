@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { authPlan, runAuthSequence, isCliReady } from '../scripts/auth.mjs';
+import { authPlan, runAuthSequence } from '../scripts/auth.mjs';
+import { isCliReady } from '../src/detect.mjs';
 
 test('authPlan receiver hermes includes hermes only', () => {
   const plan = authPlan({

@@ -1,54 +1,18 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { join, dirname, resolve } from 'node:path';
 import { homedir } from 'node:os';
-import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { stdin as input, stdout as output } from 'node:process';
 import { runSetupTui } from './setup-tui.mjs';
 import { initConfig } from '../src/config.mjs';
 import { setNode } from '../src/nodes.mjs';
 import { resolveHome } from '../src/paths.mjs';
+import { detectClis, resolveBinaryPath } from '../src/detect.mjs';
 import { runAuthSequence } from './auth.mjs';
 import { loadLaunchd } from './launchd.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '..');
-
-export const CLI_CANDIDATES = {
-  codex: { binary: 'codex', provider: 'codex-exec', nodeId: 'codex' },
-  cursor: { binary: 'agent', provider: 'cursor-agent', nodeId: 'cursor' },
-  hermes: { binary: 'hermes', provider: 'hermes-cli', nodeId: 'hermes' },
-  antigravity: { binary: 'agy', provider: 'antigravity-cli', nodeId: 'antigravity' },
-};
-
-export function resolveBinaryPath(binary) {
-  try {
-    const cmd = process.platform === 'win32' ? 'where' : 'which';
-    return execSync(`${cmd} ${binary}`, { encoding: 'utf8' }).trim();
-  } catch {
-    return binary;
-  }
-}
-
-export function commandExists(binary) {
-  try {
-    const cmd = process.platform === 'win32' ? 'where' : 'which';
-    execSync(`${cmd} ${binary}`, { stdio: 'ignore' });
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-export function detectClis() {
-  const found = [];
-  for (const [key, spec] of Object.entries(CLI_CANDIDATES)) {
-    if (commandExists(spec.binary)) {
-      found.push({ key, ...spec });
-    }
-  }
-  return found;
-}
 
 export function buildMcpEntry(relayMcpPath) {
   return {

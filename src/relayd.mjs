@@ -201,6 +201,16 @@ export function tick(home, { spawnFn = spawn } = {}) {
       results.push({ id: task.id, ...wake });
     } catch (err) {
       appendLog(home, { op: 'relayd_error', id: task.id, error: err.message });
+      // 将异常任务恢复为 pending，防止永久卡死
+      // 仅当任务已被 claim (在 active 中) 时才 recover
+      try {
+        const activePath = join(layout(home).active(nodeId), `${task.id}.json`);
+        if (existsSync(activePath)) {
+          recoverTask(config, nodeId, task.id);
+        }
+      } catch (recoverErr) {
+        appendLog(home, { op: 'recover_failed', id: task.id, error: recoverErr.message });
+      }
       results.push({ id: task.id, woke: false, reason: err.message });
     }
   }

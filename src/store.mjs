@@ -108,7 +108,9 @@ function archivePlanOnResult(config, executorNode, taskId) {
   mkdirSync(dirname(dst), { recursive: true, mode: 0o700 });
   try {
     renameSync(src, dst);
-  } catch {
+  } catch (err) {
+    // 归档失败不应阻塞流程，但必须记录
+    appendLog(config.home, { op: 'archive_failed', id: taskId, error: err.message });
     return null;
   }
   const task = readJson(dst);
