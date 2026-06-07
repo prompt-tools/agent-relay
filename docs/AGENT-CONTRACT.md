@@ -1,115 +1,99 @@
 # Agent 工作契约
 
-> **本文件不是第二套工作流**，而是把 agent-relay 的硬约束 **绑定到已有技能/体系**。  
-> 新会话：读 `PRINCIPLES.md` → 本文件 → `MEMORY.md` → `WORKLOG.md`。  
-> **MUST：** 执行约束前先 **Read 对应 SKILL.md**，按技能流程走，不在此重复技能全文。
+> 把 agent-relay 的硬约束 **绑定到 Superpowers 技能 + Cursor Subagent**。  
+> 新会话：**Read `using-superpowers`** → 本文件 → `PRINCIPLES.md` → `MEMORY.md` → `WORKLOG.md`。  
+> **MUST：** 动手前先 **Read 对应 Superpowers SKILL.md**；审查/实现派 **Cursor Subagent**。
+
+**本仓库只用两套体系，不用 GSD / OMX / 其它技能库。**
 
 ---
 
-## 0. 为什么不自己写流程
+## 0. 双体系分工
 
-用户要求：**能约束就约束，但优先用现成技能**。下列体系里已有同类约束：
+| 层 | 负责什么 | 入口 |
+|----|----------|------|
+| **Superpowers** | 何时做、按什么顺序、Red Flags、验证门槛 | Cursor 插件技能（Read SKILL.md） |
+| **Cursor Subagent** | 隔离上下文地 **实现 / 审查 / 探索 / 修 review** | Task 工具，`subagent_type` |
 
-| 体系 | 核心约束 | 典型技能 |
-|------|----------|------------|
-| **Superpowers**（本仓库默认） | 计划 → subagent 实现 → **规格审查 → 质量审查** → 验证 → 收尾 | `writing-plans`, `subagent-driven-development`, `requesting-code-review`, `verification-before-completion` |
-| **GSD / `.agents/skills`** | 证据先于声称；审查只读；TDD | `verify-before-complete`, `review`, `tdd`, `handoff` |
-| **OMX / Codex** | 规划 → 实现 → 审查闭环，审查不 clean 回规划 | `autopilot`（`ralplan → ralph → code-review`） |
-| **Cursor Subagent** | 隔离上下文的专业角色 | `code-reviewer`, `gsd-executor`, `gsd-code-fixer`, `explore` |
-
-**agent-relay 默认栈 = Superpowers + Cursor subagent + GSD 验证/交接**。OMX `autopilot` 仅当用户显式要 `$autopilot` 时用。
-
-不确定有没有技能 → **Read `find-skills`** 或 `npx skills find [query]`。
+主 Agent = 编排者：Read 技能 → 拆 Task → 派 Subagent → 合并摘要 → 落盘。
 
 ---
 
-## 1. 约束 → 技能映射（MUST 对照执行）
+## 1. Superpowers 技能映射
 
-### 1.1 多步功能（Phase / 多个 Task）
+### 1.1 会话与多步功能
 
-| 步骤 | MUST Read 技能 | MUST 产出 |
-|------|----------------|-----------|
-| 写计划 | **`writing-plans`** | `docs/superpowers/plans/YYYY-MM-DD-*.md`（含 Task checklist） |
-| 隔离分支（大改） | **`using-git-worktrees`** | 独立 worktree（用户未禁止时） |
-| 执行 | **`subagent-driven-development`** | 每 Task 新鲜 subagent；**禁止**主 Agent 写大 diff |
-| 收尾 | **`finishing-a-development-branch`** | merge / PR / 清理选项 |
+| 场景 | MUST Read 技能 | 产出 |
+|------|----------------|------|
+| **每个新会话** | **`using-superpowers`** | 确认如何找技能、先 Read 再答 |
+| 创意 / 新 Phase 定稿 | **`brainstorming`** | 需求与设计对齐后再写 plan |
+| 多 Task 实现 | **`writing-plans`** | `docs/superpowers/plans/YYYY-MM-DD-*.md` |
+| 大改隔离 | **`using-git-worktrees`** | 独立 worktree（用户未禁止时） |
+| 本会话执行 plan | **`subagent-driven-development`** | 每 Task 新鲜 Subagent |
+| 另开会话执行 plan | **`executing-plans`** | 带 checkpoint 的并行会话 |
+| 2+ 独立 Task 并行 | **`dispatching-parallel-agents`** | 多个 Subagent 同时派 |
+| 全部 Task 完成 | **`finishing-a-development-branch`** | merge / PR / 清理 |
+| Bug / 测试红 | **`systematic-debugging`** | 先证据再修 |
+| 写功能 / 修 bug 前 | **`test-driven-development`** | 先 failing test |
 
-### 1.2 每个 Task 内（不可合并、不可跳过）
-
-顺序来自 **`subagent-driven-development`** Red Flags：
+### 1.2 每个 Task 内（`subagent-driven-development`）
 
 ```
-implementer subagent
-  → spec reviewer（模板: subagent-driven-development/spec-reviewer-prompt.md）
-  → code quality reviewer（技能: requesting-code-review + code-reviewer subagent）
-  → 若有 Important/Critical → gsd-code-fixer 或 implementer 重派 → re-review
-  → verification-before-completion（fresh npm test）
-  → WORKLOG 一行
+① Read implementer-prompt.md → 派 Implementer Subagent
+② Read spec-reviewer-prompt.md → 派 Spec Reviewer（generalPurpose）
+③ Read requesting-code-review → 派 code-reviewer（带 BASE_SHA / HEAD_SHA）
+④ Important/Critical → 派 Fixer Subagent → ③ re-review
+⑤ Read verification-before-completion → fresh npm test
+⑥ WORKLOG 一行
+⑦ 全部 Task 完 → 再派 code-reviewer 终审整个 range
 ```
 
-| 审查类型 | 派谁 | 技能/模板 |
-|----------|------|-----------|
-| 规格 | `generalPurpose` subagent | **`spec-reviewer-prompt.md`** — 逐项 PASS/FAIL，不信 implementer 自述 |
-| 质量 | `code-reviewer` subagent | **`requesting-code-review`** — 必带 `BASE_SHA` / `HEAD_SHA` / 需求摘要 |
-| 修问题 | `gsd-code-fixer` 或 implementer | 修完 **必须** quality re-review |
-| 整批终审 | `code-reviewer` subagent | 覆盖整个 commit range |
+| 步骤 | Superpowers | Cursor Subagent |
+|------|-------------|-----------------|
+| 实现 | `implementer-prompt.md` | `gsd-executor` 或 `generalPurpose` |
+| 规格审查 | `spec-reviewer-prompt.md` | `generalPurpose` |
+| 质量审查 | `requesting-code-review` | **`code-reviewer`** |
+| 收到 review 意见时 | **`receiving-code-review`** | 主 Agent 判断是否采纳再派 Fixer |
+| 修 Important+ | — | `gsd-code-fixer` 或 Implementer 重派 |
+| 声称完成 | **`verification-before-completion`** | 主 Agent 跑 `npm test` |
 
-**MUST NOT**（摘自 superpowers Red Flags）：
+**MUST NOT**（Superpowers Red Flags）：
 - 一次 review 糊弄多个 Task  
 - 规格未 ✅ 就做质量审查  
-- 审查有问题仍进入下一 Task  
-- 让 subagent 自己读 plan 文件（主 Agent 贴 **完整 Task 文本**）  
-- implementer 自 review 代替 spec/quality 审查  
+- 有问题仍进下一 Task  
+- 让 Subagent 自己读 plan（主 Agent 贴 **完整 Task 文本**）  
+- Implementer 自 review 代替双审查  
 
-### 1.3 声称「完成 / 测试通过 / 已修复」
+验证命令：**`npm test`** — claim 时必须引用本轮 **pass N/N**。
 
-| MUST Read | 铁律 |
-|-----------|------|
-| **`verification-before-completion`**（Superpowers） | 同一消息内 **fresh** 跑验证；无输出 = 不能说完成 |
-| **`verify-before-complete`**（GSD，同义） | 证据先于声称；「刚才跑过」不算 |
+### 1.3 上下文 >75%（proxy：summary / 跨 Phase / 反复扫 transcript）
 
-本项目验证命令：**`npm test`**（claim 时引用 pass N/N）。
+无单独 handoff 技能；按本仓库协议：
 
-### 1.4 上下文 >75%（或 summary / 跨 Phase）
-
-| 步骤 | 技能 |
-|------|------|
-| 落盘 | 写 `MEMORY.md` / `WORKLOG.md`（只增，引用路径） |
-| 交接 | **`handoff`** — OS 临时目录，含 suggested skills |
-| 收窄 | 以 MEMORY/WORKLOG/ROADMAP 为真源；**禁止**再扫 transcript |
-
-**MUST NOT：** 用 `caveman` 代替上下文管理。
-
-### 1.5 其它常见场景
-
-| 场景 | 技能 |
-|------|------|
-| 创意/新功能定稿前 | `brainstorming` |
-| 写测试 | `test-driven-development` / `tdd` |
-| 只读代码审查（无 subagent） | `review` |
-| 安全 | `security-review` |
-| 拆 PR | `split-to-prs` |
-| 用户要全自动 | `autopilot`（OMX 三环，审查不 clean 回 `ralplan`） |
-| Cursor 产品问题 | `cursor-guide` |
+1. 新内容 → `MEMORY.md` / `WORKLOG.md`（只增，引用路径）  
+2. 有授权且有待提交改动 → commit  
+3. **真源** = MEMORY / WORKLOG / ROADMAP / plan；**禁止**再扫 transcript  
+4. 对用户回复缩短；代码用 citation  
 
 ---
 
-## 2. 角色分工（绑定 subagent 类型）
+## 2. Cursor Subagent 速查
 
-| 角色 | Cursor subagent / 技能 | MUST | MUST NOT |
-|------|------------------------|------|----------|
-| **主 Agent** | 编排 | Read 上表技能；拆 Task；派 subagent；合并摘要；落盘 | 自己实现大 diff；跳过双审查 |
-| **Implementer** | `gsd-executor` / `generalPurpose` + **implementer-prompt.md** | 代码+测试+中文摘要 | 改 scope；无测试报完成 |
-| **Spec reviewer** | `generalPurpose` + **spec-reviewer-prompt.md** | 独立 verify checklist | 信任 implementer 报告 |
-| **Quality reviewer** | **`code-reviewer`** + **requesting-code-review** | BASE/HEAD SHA + 结构化结论 | 泛泛而谈 |
-| **Fixer** | `gsd-code-fixer` | 最小 diff 修 Important+ | 顺手重构 |
-| **Explore** | `explore` | 路径+结论 | 贴全文 |
+| subagent_type | 何时派 |
+|---------------|--------|
+| **`code-reviewer`** | 每 Task 质量审查；整批终审 |
+| **`generalPurpose`** | Spec 审查；小 Task 实现 |
+| **`gsd-executor`** | 按计划实现（多文件 Task） |
+| **`gsd-code-fixer`** | 修 review 的 Important/Critical |
+| **`explore`** | 查代码结构；只返路径+结论 |
+
+主 Agent **MUST NOT** 自己写大 diff 代替 Implementer。
 
 ---
 
-## 3. agent-relay 专属边界（无外部技能替代）
+## 3. agent-relay 专属边界
 
-来自 `PRINCIPLES.md` / `FOCUS.md` — **项目 MUST NOT**：
+来自 `PRINCIPLES.md` / `FOCUS.md` — **MUST NOT**：
 
 - inbox / pull / complete  
 - Ruflo 联邦主路径  
@@ -117,52 +101,39 @@ implementer subagent
 - 四 IDE 全家桶 setup  
 - 无 ROADMAP 授权的 Docker / 跨机 / Web 面板  
 - 新增 npm 运行时依赖  
-- CLI 与 MCP 不同构（必须共用 `store.mjs`）  
+- CLI 与 MCP 不同构  
 
-技术：**新 provider** → `src/providers/` + `relayd.mjs`；**改协议** → `schema.mjs` + 测试。
-
----
-
-## 4. Git / 沟通 / 自主推进
-
-| 主题 | 规则 |
-|------|------|
-| commit/push | 用户授权自主推进 **或** 明确要求；遵循用户 git 安全规则 |
-| 对用户 | 简体中文；结论先行；不贴 subagent 全文 |
-| 自主推进 | 用户已授权 → 按 `ROADMAP` 继续，少反复确认 |
+**MUST：** 新 provider → `src/providers/` + `relayd.mjs`；改协议 → `schema.mjs` + 测试。
 
 ---
 
-## 5. 回复用户前自检（10 秒）
+## 4. Git / 沟通
 
-1. 该 Task 是否 **Read 并遵循** 了对应 SKILL.md？  
-2. 规格审查 + 质量审查是否 **各派一次**？  
-3. `verification-before-completion`：**本轮** 有 `npm test` 输出吗？  
+- commit/push：用户授权自主推进 **或** 明确要求  
+- 对用户：简体中文；结论先行；不贴 Subagent 全文  
+
+---
+
+## 5. 回复前自检
+
+1. 是否 Read 了该步 Superpowers SKILL.md？  
+2. 本 Task 是否 **Spec + Quality** 各派一次 Subagent？  
+3. 是否按 **`verification-before-completion`** 刚跑过 `npm test`？  
 4. WORKLOG 写了吗？  
-5. 上下文是否该 **`handoff`**？  
-
-任一项否 → 先补，再对用户说话。
+5. 上下文是否该触发 §1.3 落盘+收窄？  
 
 ---
 
-## 6. 技能路径速查
+## 6. Superpowers 模板路径
 
-| 技能 | 路径 |
-|------|------|
-| subagent-driven-development | `~/.cursor/plugins/.../superpowers/.../subagent-driven-development/SKILL.md` |
-| spec-reviewer-prompt | 同上目录 `spec-reviewer-prompt.md` |
-| implementer-prompt | 同上目录 `implementer-prompt.md` |
-| code-quality-reviewer-prompt | 同上目录 `code-quality-reviewer-prompt.md` |
-| requesting-code-review | `~/.cursor/plugins/.../requesting-code-review/SKILL.md` |
-| verification-before-completion | `~/.cursor/plugins/.../verification-before-completion/SKILL.md` |
-| writing-plans | `~/.cursor/plugins/.../writing-plans/SKILL.md` |
-| handoff | `~/.agents/skills/handoff/SKILL.md` |
-| verify-before-complete | `~/.agents/skills/verify-before-complete/SKILL.md` |
-| review | `~/.agents/skills/review/SKILL.md` |
-| find-skills | `~/.agents/skills/find-skills/SKILL.md` |
-| autopilot | `~/.codex/skills/autopilot/SKILL.md` |
+均在 Cursor Superpowers 插件目录下（`subagent-driven-development/`）：
 
-> Cursor 内可直接 `@` 技能名或让 Agent **Read** 上表路径。
+- `SKILL.md`
+- `implementer-prompt.md`
+- `spec-reviewer-prompt.md`
+- `code-quality-reviewer-prompt.md`
+
+其它常用技能同插件：`writing-plans`、`requesting-code-review`、`verification-before-completion`、`using-superpowers`。
 
 ---
 
@@ -170,9 +141,9 @@ implementer subagent
 
 | 文件 | 用途 |
 |------|------|
-| **`docs/AGENT-CONTRACT.md`** | 本文件 — 约束 ↔ 技能绑定 |
-| `AGENTS.md` | 仓库开发指引 |
+| **`docs/AGENT-CONTRACT.md`** | 本文件 |
+| `AGENTS.md` | 开发指引 |
 | `docs/PRINCIPLES.md` | 产品原则 |
 | `docs/MEMORY.md` | 踩坑与决策 |
-| `docs/WORKLOG.md` | 时间线证据 |
-| `.cursor/rules/agent-relay.mdc` | Cursor 自动加载摘要 |
+| `docs/WORKLOG.md` | 时间线 |
+| `.cursor/rules/agent-relay.mdc` | Cursor 规则摘要 |

@@ -1,32 +1,33 @@
 ---
-description: agent-relay 硬约束 — 协议、编排、审查、上下文
+description: agent-relay — Superpowers + Cursor Subagent only
 alwaysApply: true
 ---
 
 # agent-relay
 
-## 必读（按序）
+## 体系（仅此两套）
 
-`docs/PRINCIPLES.md` → **`docs/AGENT-CONTRACT.md`**（约束↔技能绑定）→ `docs/MEMORY.md`
+- **Superpowers**：Read SKILL.md 再动手（`using-superpowers` 起手）
+- **Cursor Subagent**：实现 / 双审查 / 修 review / explore
 
-## 执行前 MUST Read 技能
+不用 GSD、OMX 或其它技能库。
 
-| 场景 | 技能 |
-|------|------|
-| 多 Task | `writing-plans` → `subagent-driven-development` |
-| 每 Task 审查 | `spec-reviewer-prompt.md` → `requesting-code-review` + `code-reviewer` |
-| 说完成 | `verification-before-completion` |
-| 上下文满 | `handoff` |
+## 必读
 
-## 编排
+`docs/AGENT-CONTRACT.md` → `docs/PRINCIPLES.md` → `docs/MEMORY.md`
 
-主 Agent 只编排；实现/双审查派 subagent。Red Flags 见 superpowers `subagent-driven-development`。
+## 每 Task
 
-## 代码
+`subagent-driven-development`：Implementer → spec（generalPurpose）→ quality（**code-reviewer** + BASE/HEAD SHA）→ `verification-before-completion`（fresh `npm test`）
 
-- 零新 npm 依赖；provider → `src/providers/` + `relayd.mjs`
-- 完成前：`npm test` 全绿 + WORKLOG 一行
+## 主 Agent
+
+只编排、落盘、汇报；不写大 diff。
+
+## 产品
+
+send/receive only；E2E **cursor → hermes**；零新 npm 依赖
 
 ## 禁止
 
-Ruflo 联邦、inbox/pull/complete、四 IDE 全家桶、无测试/无审查的「做完了」
+跳过双审查、无测试说完成、inbox/Ruflo/四 IDE 全家桶

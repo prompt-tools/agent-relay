@@ -71,12 +71,9 @@
 
 ### 编排模式（用户 2026-06-07）
 
-- **主 Agent 只管主线**；实现与 **双阶段审查** 派 subagent。
-- **约束不另起炉灶**：绑定 Superpowers / GSD / OMX 已有技能 — 见 **`docs/AGENT-CONTRACT.md`**（含技能路径速查、`spec-reviewer-prompt.md`、`requesting-code-review` 等）。
-
-### 找技能
-
-- 不确定用哪个 → Read **`find-skills`** 或 `npx skills find`。
+- **仅 Superpowers + Cursor Subagent**（GSD/OMX 已卸载，不再引用）。
+- 契约：**`docs/AGENT-CONTRACT.md`** — 技能映射 + Subagent 类型 + Red Flags。
+- 新会话先 **`using-superpowers`**。
 
 ## 明确不做
 
