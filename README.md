@@ -53,6 +53,7 @@ relay receive cursor --type result
 
 | 文件 | 内容 |
 |------|------|
+| [docs/OPERATIONS.md](docs/OPERATIONS.md) | 运维一页纸：日常检查 / 发收任务 / 排障 / plan 模板 |
 | [docs/AGENT-CONTRACT.md](docs/AGENT-CONTRACT.md) | Agent 工作契约（含 Hermes 派活 + 第三方审查） |
 | [docs/E2E.md](docs/E2E.md) | E2E 与 smoke |
 | [docs/SETUP.md](docs/SETUP.md) | 安装与 OAuth |
