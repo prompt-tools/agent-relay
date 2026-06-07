@@ -16,6 +16,10 @@ alwaysApply: true
 
 `docs/AGENT-CONTRACT.md` → `docs/PRINCIPLES.md` → `docs/MEMORY.md`
 
+## 新功能
+
+Research-First §0.1：调研 → 审 → 设计 → 审 → 计划 → 审 → 实现 → 再审（见 AGENT-CONTRACT）
+
 ## 每 Task
 
 `subagent-driven-development`：Implementer → spec（generalPurpose）→ quality（**code-reviewer** + BASE/HEAD SHA）→ `verification-before-completion`（fresh `npm test`）
