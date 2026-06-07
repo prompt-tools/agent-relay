@@ -4,7 +4,7 @@
 
 ## 核心决策（不可忘）
 
-1. **对称 send/receive**，无 inbox/pull/complete（`relay pull|complete|fail` 仅为 deprecated stub）。
+1. **对称 send/receive**，无 inbox/pull/complete（deprecated stub 已删除，Batch 3 完成）。
 2. **主 E2E：cursor → hermes**（非 codex 默认）。
 3. **唤醒 = relayd + provider spawn**；prompt 尾部须含完整 `relay send` 命令。
 4. **按角色 setup**（sender/receiver/both），非四 IDE 全家桶。
@@ -55,7 +55,7 @@
 - 架构 hub：`store.mjs`；provider 表硬编码在 `relayd.mjs`
 - Batch 1 ✅ PROMPTS、config.example、MCP version、RELIABILITY
 - Batch 2 ✅ CONTRACT S/M/L、AGENTS/rule 瘦身
-- Batch 3 ⏸ 删 deprecated stub、合并 relayLog（未做，低优）
+- Batch 3 ✅ 删 deprecated stub + 合并 appendLog/relayLog → `src/log.mjs`
 
 ### 变更档位（CONTRACT §0.1）
 

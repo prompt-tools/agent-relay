@@ -205,6 +205,17 @@
 
 ---
 
+## 2026-06-07 — 审计 Batch 3：deprecated stub + relayLog 合并
+
+**完成**（S 档，Hermes 接手）：
+- 删除 `bin/relay.js` 中 `relay pull|complete|fail` deprecated stub + `deprecated()` 函数
+- `appendLog`（store.mjs）+ `relayLog`（relayd.mjs）→ 统一 `src/log.mjs`
+- `store.mjs` / `relayd.mjs` 改为 `import { appendLog } from './log.mjs'`
+
+**测试**：62/62
+
+---
+
 | 日期 | 决策 | 原因 |
 |------|------|------|
 | 2026-06-07 | E2E 主路径改 hermes | 用户无 codex 额度 |

@@ -6,7 +6,6 @@ import {
   openSync,
   closeSync,
   fsyncSync,
-  appendFileSync,
   mkdirSync,
   writeFileSync,
 } from 'node:fs';
@@ -15,6 +14,7 @@ import { randomBytes } from 'node:crypto';
 import { layout, ensureLayout } from './paths.mjs';
 import { assertNode } from './config.mjs';
 import { validateEnvelope } from './schema.mjs';
+import { appendLog } from './log.mjs';
 
 function atomicWriteJson(filePath, data) {
   const dir = join(filePath, '..');
@@ -31,13 +31,7 @@ function atomicWriteJson(filePath, data) {
   renameSync(tmp, filePath);
 }
 
-function appendLog(home, entry) {
-  const p = layout(home);
-  appendFileSync(p.log, JSON.stringify({ ts: new Date().toISOString(), ...entry }) + '\n', {
-    flag: 'a',
-    mode: 0o600,
-  });
-}
+
 
 function taskFileName(id) {
   return `${id}.json`;

@@ -37,9 +37,6 @@ Usage:
   relay smoke [--project <path>] [--marker <text>] [--timeout <sec>]
   relay setup [--role sender|receiver|both] [--node <nodeId>] [--dry-run] [--skip-auth]
 
-Deprecated (use send/receive instead):
-  relay pull, relay complete, relay fail
-
 Env: AGENT_RELAY_HOME (default ~/.agent-relay)
 `);
 }
@@ -50,19 +47,7 @@ function flag(name) {
   return args[i + 1];
 }
 
-function deprecated(name) {
-  console.error(
-    JSON.stringify(
-      {
-        ok: false,
-        error: `relay ${name} is deprecated; use relay send/receive. See docs/PRINCIPLES.md`,
-      },
-      null,
-      2,
-    ),
-  );
-  process.exitCode = 1;
-}
+
 
 async function run() {
   if (!cmd || cmd === '--help' || cmd === '-h') {
@@ -96,10 +81,7 @@ async function run() {
     return;
   }
 
-  if (cmd === 'pull' || cmd === 'complete' || cmd === 'fail') {
-    deprecated(cmd);
-    return;
-  }
+
 
   const config = loadConfig(home);
 

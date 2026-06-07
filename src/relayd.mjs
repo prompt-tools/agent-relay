@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync, existsSync, unlinkSync, appendFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, unlinkSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -7,6 +7,7 @@ import { loadConfig } from './config.mjs';
 import { listTasks, claimTask } from './store.mjs';
 import { getProvider, getNodeSpec } from './nodes.mjs';
 import { recoverTask } from './recover.mjs';
+import { appendLog } from './log.mjs';
 import { buildCodexSpawn } from './providers/codex.mjs';
 import { buildHermesSpawn } from './providers/hermes.mjs';
 import { buildCursorSpawn } from './providers/cursor.mjs';
@@ -22,13 +23,7 @@ const PROVIDERS = {
   'antigravity-cli': buildAntigravitySpawn,
 };
 
-function relayLog(home, entry) {
-  const logPath = layout(home).log;
-  appendFileSync(logPath, JSON.stringify({ ts: new Date().toISOString(), ...entry }) + '\n', {
-    flag: 'a',
-    mode: 0o600,
-  });
-}
+
 
 export function loadProcessed(home) {
   const p = layout(home).relaydProcessed;
@@ -95,7 +90,7 @@ export function wakeTask(home, task, config, nodeId, { spawnFn = spawn } = {}) {
 
   child.on('error', (err) => {
     spawnFailed = true;
-    relayLog(home, { op: 'spawn_error', id: task.id, cmd: spec.cmd, error: err.message });
+    appendLog(home, { op: 'spawn_error', id: task.id, cmd: spec.cmd, error: err.message });
     handleWakeFailure(home, config, nodeId, task.id, err.message);
   });
 
@@ -119,13 +114,13 @@ export function handleWakeFailure(home, config, nodeId, taskId, error) {
     const processed = loadProcessed(home);
     processed.delete(taskId);
     saveProcessed(home, processed);
-    relayLog(home, { op: 'wake_retry', id: taskId, attempt: count, error });
+    appendLog(home, { op: 'wake_retry', id: taskId, attempt: count, error });
   } catch (err) {
-    relayLog(home, { op: 'recover_failed', id: taskId, error: err.message });
+    appendLog(home, { op: 'recover_failed', id: taskId, error: err.message });
   }
 
   if (count >= MAX_RETRIES) {
-    relayLog(home, { op: 'wake_give_up', id: taskId, attempts: count });
+    appendLog(home, { op: 'wake_give_up', id: taskId, attempts: count });
   }
 }
 
@@ -151,14 +146,14 @@ export function tick(home, { spawnFn = spawn } = {}) {
       if (wake.woke && wake.pid) {
         processed.add(task.id);
         saveProcessed(home, processed);
-        relayLog(home, { op: 'wake_ok', id: task.id, pid: wake.pid, provider: getProvider(home, task.to) });
+        appendLog(home, { op: 'wake_ok', id: task.id, pid: wake.pid, provider: getProvider(home, task.to) });
       } else {
         handleWakeFailure(home, config, nodeId, task.id, wake.reason || 'wake failed');
       }
 
       results.push({ id: task.id, ...wake });
     } catch (err) {
-      relayLog(home, { op: 'relayd_error', id: task.id, error: err.message });
+      appendLog(home, { op: 'relayd_error', id: task.id, error: err.message });
       results.push({ id: task.id, woke: false, reason: err.message });
     }
   }
