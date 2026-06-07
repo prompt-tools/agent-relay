@@ -25,6 +25,11 @@ const PROVIDERS = {
 
 
 
+/**
+ * Load the set of already-processed task ids from disk.
+ * @param {string} home - Relay home path
+ * @returns {Set<string>} Set of processed task ids
+ */
 export function loadProcessed(home) {
   const p = layout(home).relaydProcessed;
   if (!existsSync(p)) return new Set();
@@ -32,22 +37,42 @@ export function loadProcessed(home) {
   return new Set(data.processed || []);
 }
 
+/**
+ * Persist the set of processed task ids to disk.
+ * @param {string} home - Relay home path
+ * @param {Set<string>} set - Processed task ids
+ */
 export function saveProcessed(home, set) {
   const p = layout(home).relaydProcessed;
   writeFileSync(p, JSON.stringify({ processed: [...set] }, null, 2) + '\n', { mode: 0o600 });
 }
 
+/**
+ * Load the retry count map from disk.
+ * @param {string} home - Relay home path
+ * @returns {Object<string, number>} Map of task id to retry count
+ */
 export function loadRetries(home) {
   const p = layout(home).relaydRetries;
   if (!existsSync(p)) return {};
   return JSON.parse(readFileSync(p, 'utf8')).retries || {};
 }
 
+/**
+ * Persist the retry count map to disk.
+ * @param {string} home - Relay home path
+ * @param {Object<string, number>} retries - Map of task id to retry count
+ */
 export function saveRetries(home, retries) {
   const p = layout(home).relaydRetries;
   writeFileSync(p, JSON.stringify({ retries }, null, 2) + '\n', { mode: 0o600 });
 }
 
+/**
+ * Acquire a PID lock file. Returns false if relayd is already running.
+ * @param {string} home - Relay home path
+ * @returns {boolean} True if lock acquired, false if already running
+ */
 export function acquireLock(home) {
   const pidFile = layout(home).relaydPid;
   if (existsSync(pidFile)) {
@@ -63,11 +88,21 @@ export function acquireLock(home) {
   return true;
 }
 
+/**
+ * Release the PID lock file.
+ * @param {string} home - Relay home path
+ */
 export function releaseLock(home) {
   const pidFile = layout(home).relaydPid;
   if (existsSync(pidFile)) unlinkSync(pidFile);
 }
 
+/**
+ * Build the spawn command for a task based on the target node's provider.
+ * @param {string} home - Relay home path
+ * @param {object} task - Task envelope
+ * @returns {{cmd: string, args: string[], env?: object}|null} Spawn spec or null
+ */
 export function buildSpawnForTask(home, task) {
   const provider = getProvider(home, task.to);
   const build = PROVIDERS[provider];
@@ -76,6 +111,15 @@ export function buildSpawnForTask(home, task) {
   return build(task, { home, relayBin: RELAY_BIN, binary: spec.binary });
 }
 
+/**
+ * Spawn an external agent process to handle a claimed task.
+ * @param {string} home - Relay home path
+ * @param {object} task - Task envelope
+ * @param {object} config - Relay config
+ * @param {string} nodeId - Node id being woken
+ * @param {{spawnFn?: Function}} [opts] - Override spawn function (for testing)
+ * @returns {{woke: boolean, pid?: number, spec?: object, reason?: string}} Wake result
+ */
 export function wakeTask(home, task, config, nodeId, { spawnFn = spawn } = {}) {
   const spec = buildSpawnForTask(home, task);
   if (!spec) return { woke: false, reason: 'manual or unknown provider' };
@@ -103,6 +147,14 @@ export function wakeTask(home, task, config, nodeId, { spawnFn = spawn } = {}) {
   return { woke: true, pid: child.pid, spec, spawnFailed };
 }
 
+/**
+ * Handle a wake failure by incrementing retry count and recovering the task.
+ * @param {string} home - Relay home path
+ * @param {object} config - Relay config
+ * @param {string} nodeId - Node id
+ * @param {string} taskId - Task id
+ * @param {string} error - Error message
+ */
 export function handleWakeFailure(home, config, nodeId, taskId, error) {
   const retries = loadRetries(home);
   const count = (retries[taskId] || 0) + 1;
@@ -124,6 +176,12 @@ export function handleWakeFailure(home, config, nodeId, taskId, error) {
   }
 }
 
+/**
+ * One poll cycle: find pending plans, claim them, wake agents.
+ * @param {string} home - Relay home path
+ * @param {{spawnFn?: Function}} [opts] - Override spawn function (for testing)
+ * @returns {object[]} Results per processed task
+ */
 export function tick(home, { spawnFn = spawn } = {}) {
   const config = loadConfig(home);
   const nodeId = config.nodeId;

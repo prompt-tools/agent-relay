@@ -53,6 +53,19 @@ The relay uses a filesystem-based task queue. `relayd` watches for incoming task
 - **Linux**: run `relayd` manually or configure a systemd unit
 - **Optional CLI tools**: `hermes`, `agent` (cursor-agent), `codex`
 
+### Optional CLI Agents
+
+agent-relay wakes external AI agents via their CLI tools. Install only the ones you use:
+
+| Tool | Package / Install | When needed |
+|------|-------------------|-------------|
+| `hermes` | `npm install -g hermes-agent` | Receiving node runs Hermes |
+| `cursor-agent` | Installed with Cursor IDE | Receiving node runs Cursor agent mode |
+| `codex` | `npm install -g @openai/codex` | Receiving node runs Codex |
+| `agy` | npm: `npm i -g @nicepkg/antigravity-cli`, Homebrew (macOS): `brew install nicepkg/tap/antigravity` | Receiving node runs Antigravity |
+
+If a CLI tool is not installed, `relayd` logs a spawn error and retries — it does not crash.
+
 ## MCP Integration (Cursor)
 
 `relay setup` merges an MCP entry into `~/.cursor/mcp.json`. Restart Cursor after setup. Tools: `relay_send`, `relay_receive`.

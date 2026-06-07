@@ -7,6 +7,11 @@ import { isCliReady } from '../scripts/auth.mjs';
 import { listStuckActive } from './recover.mjs';
 import { listOrphanPendingPlans } from './gc.mjs';
 
+/**
+ * Check if the relayd daemon is running by probing its PID file.
+ * @param {string} home - Relay home path
+ * @returns {{ok: boolean, pid?: number, reason?: string}} Daemon status
+ */
 export function checkRelayd(home) {
   const pidFile = layout(home).relaydPid;
   if (!existsSync(pidFile)) {
@@ -21,6 +26,12 @@ export function checkRelayd(home) {
   }
 }
 
+/**
+ * Return recent error entries from the relay log.
+ * @param {string} home - Relay home path
+ * @param {number} [limit=5] - Max errors to return
+ * @returns {object[]} Recent error log entries
+ */
 export function recentErrors(home, limit = 5) {
   const logPath = layout(home).log;
   if (!existsSync(logPath)) return [];
@@ -38,6 +49,11 @@ export function recentErrors(home, limit = 5) {
     .slice(-limit);
 }
 
+/**
+ * Generate a full health report for the relay setup.
+ * @param {string} [home] - Override relay home
+ * @returns {{ok: boolean, checks: object}} Health report with detailed checks
+ */
 export function healthReport(home) {
   const config = loadConfig(home);
   const nodes = loadNodes(home);

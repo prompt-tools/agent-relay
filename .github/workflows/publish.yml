@@ -1,0 +1,26 @@
+# NOTE: The @prompt-tools org must exist on npm and the NPM_TOKEN must have
+# write access to it. Create a Granular Access Token at https://www.npmjs.com/settings
+# and add it as a GitHub repo secret named NPM_TOKEN.
+
+name: Publish to npm
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - run: npm install
+      - run: npm test
+      - run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

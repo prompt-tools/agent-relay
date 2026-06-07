@@ -8,6 +8,13 @@ function taskFiles(dir) {
   return readdirSync(dir).filter((f) => f.endsWith('.json'));
 }
 
+/**
+ * List tasks stuck in the active bucket for a node.
+ * @param {object} config - Relay config
+ * @param {string} node - Node id
+ * @param {{olderThanMs?: number}} [opts] - Minimum age filter
+ * @returns {{task: object, path: string, age: number}[]} Stuck tasks with metadata
+ */
 export function listStuckActive(config, node, { olderThanMs = 0 } = {}) {
   const dir = layout(config.home).active(node);
   const now = Date.now();
@@ -21,6 +28,14 @@ export function listStuckActive(config, node, { olderThanMs = 0 } = {}) {
     .filter(({ age }) => age >= olderThanMs);
 }
 
+/**
+ * Move a single task from active back to pending for re-execution.
+ * @param {object} config - Relay config
+ * @param {string} node - Node id
+ * @param {string} taskId - Task id to recover
+ * @returns {object} The recovered task envelope
+ * @throws {Error} If task not found in active
+ */
 export function recoverTask(config, node, taskId) {
   const p = layout(config.home);
   const src = join(p.active(node), `${taskId}.json`);
@@ -34,6 +49,13 @@ export function recoverTask(config, node, taskId) {
   return task;
 }
 
+/**
+ * Recover all stuck active tasks for a node back to pending.
+ * @param {object} config - Relay config
+ * @param {string} node - Node id
+ * @param {{olderThanMs?: number}} [options] - Minimum age filter
+ * @returns {object[]} Recovered task envelopes
+ */
 export function recoverAllStuck(config, node, options = {}) {
   const stuck = listStuckActive(config, node, options);
   const recovered = [];

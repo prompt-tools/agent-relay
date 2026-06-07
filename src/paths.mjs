@@ -2,16 +2,31 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { mkdirSync, existsSync } from 'node:fs';
 
+/**
+ * Expand ~ to the OS home directory.
+ * @param {string} p - Path that may start with ~
+ * @returns {string} Absolute path
+ */
 export function expandHome(p) {
   if (!p || p === '~') return homedir();
   if (p.startsWith('~/')) return join(homedir(), p.slice(2));
   return p;
 }
 
+/**
+ * Resolve the agent-relay home directory from explicit arg, env, or default.
+ * @param {string} [explicit] - Explicit home path
+ * @returns {string} Absolute path to relay home
+ */
 export function resolveHome(explicit) {
   return expandHome(explicit || process.env.AGENT_RELAY_HOME || '~/.agent-relay');
 }
 
+/**
+ * Return the directory layout object for a given home.
+ * @param {string} [home] - Override relay home
+ * @returns {object} Layout with paths and bucket accessors
+ */
 export function layout(home) {
   const h = resolveHome(home);
   return {
@@ -31,6 +46,11 @@ export function layout(home) {
   };
 }
 
+/**
+ * Create all required directories under home if they don't exist.
+ * @param {string} [home] - Override relay home
+ * @returns {object} Layout object
+ */
 export function ensureLayout(home) {
   const p = layout(home);
   for (const dir of [

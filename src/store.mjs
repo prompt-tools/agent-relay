@@ -37,6 +37,7 @@ function taskFileName(id) {
   return `${id}.json`;
 }
 
+/** Generate a timestamp-based task ID (YYYYMMDD-HHMMSS-xxxx). */
 export function newTaskId() {
   const d = new Date();
   const pad = (n) => String(n).padStart(2, '0');
@@ -44,6 +45,21 @@ export function newTaskId() {
   return `${stamp}-${randomBytes(2).toString('hex')}`;
 }
 
+/**
+ * Create a task envelope and write it to the target node's pending queue.
+ * @param {object} config - Relay config from loadConfig()
+ * @param {object} input - Task input
+ * @param {string} [input.type='plan'] - Task type (plan or result)
+ * @param {string} input.to - Target node id
+ * @param {string} input.from - Sender node id
+ * @param {string} input.projectPath - Absolute path to the project
+ * @param {string} [input.title] - Task title
+ * @param {object} [input.body={}] - Task body payload
+ * @param {string} [input.taskId] - Related task id (for results)
+ * @param {string[]} [input.acceptance=[]] - Acceptance criteria
+ * @param {object} [input.refs={}] - Reference links
+ * @returns {object} The validated task envelope
+ */
 export function sendTask(config, input) {
   const {
     type = 'plan',
@@ -136,6 +152,13 @@ function findTaskFile(config, id) {
   return null;
 }
 
+/**
+ * List tasks in a given bucket for a node.
+ * @param {object} config - Relay config
+ * @param {string} node - Node id
+ * @param {string} [status='pending'] - Bucket: pending, active, done, failed
+ * @returns {object[]} Task envelopes sorted by createdAt descending
+ */
 export function listTasks(config, node, status = 'pending') {
   assertNode(config, node);
   const p = layout(config.home);
@@ -145,12 +168,28 @@ export function listTasks(config, node, status = 'pending') {
     .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
 }
 
+/**
+ * List pending tasks for a node, optionally filtered by type.
+ * @param {object} config - Relay config
+ * @param {string} node - Node id
+ * @param {{type?: string}} [opts] - Filter options
+ * @returns {object[]} Pending task envelopes
+ */
 export function receiveTasks(config, node, { type } = {}) {
   const tasks = listTasks(config, node, 'pending');
   if (!type) return tasks;
   return tasks.filter((t) => t.type === type);
 }
 
+/**
+ * Move a pending task to active (claim it for execution).
+ * If no id given, claims the oldest pending task.
+ * @param {object} config - Relay config
+ * @param {string} node - Node id
+ * @param {string} [id] - Specific task id, or omit for oldest
+ * @returns {object} The claimed task envelope
+ * @throws {Error} If no pending tasks or claim fails
+ */
 export function claimTask(config, node, id) {
   assertNode(config, node);
   const p = layout(config.home);
@@ -180,6 +219,11 @@ export function claimTask(config, node, id) {
   return task;
 }
 
+/**
+ * Return task counts per node per bucket.
+ * @param {object} config - Relay config
+ * @returns {{home: string, nodeId: string, counts: object}} Status summary
+ */
 export function status(config) {
   ensureLayout(config.home);
   const p = layout(config.home);
@@ -194,6 +238,13 @@ export function status(config) {
   return { home: p.home, nodeId: config.nodeId, counts };
 }
 
+/**
+ * Find and return a task by id across all buckets and nodes.
+ * @param {object} config - Relay config
+ * @param {string} id - Task id
+ * @returns {{bucket: string, node: string, path: string, task: object}} Task location and data
+ * @throws {Error} If task not found
+ */
 export function showTask(config, id) {
   const found = findTaskFile(config, id);
   if (!found) throw new Error(`Task not found: ${id}`);
