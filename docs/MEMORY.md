@@ -66,7 +66,7 @@
 ### 上下文预算（用户 2026-06-07）
 
 - 当上下文接近满（>75% 或出现 conversation summary）时，**自动**执行精简，保持注意力在当前任务。
-- 顺序：落盘 MEMORY/WORKLOG → commit（若适用）→ 以文档为真源、停读 transcript → 必要时 `handoff`。
+- 顺序：落盘 MEMORY/WORKLOG → commit（若适用）→ 以文档为真源、停读 transcript（无 handoff 技能，见 AGENT-CONTRACT §1.3）。
 - 详见 `AGENTS.md`「上下文预算」；已写入 `.cursor/rules/agent-relay.mdc`。
 
 ### 编排模式（用户 2026-06-07）
