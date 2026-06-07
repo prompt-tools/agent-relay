@@ -85,22 +85,19 @@ relayd
 cat ~/.agent-relay/relayd.stderr.log
 ```
 
-### orphan（孤儿 pending）
+### orphan（pending 脏副本）
 
-relayd 已 claim 但进程中途挂了，任务留在 active 不回来。
+`health.checks.orphanPendingPlans` 非空：任务 id 已在 `relayd.processed`，但 `pending/<node>/` 里仍有一份 plan 副本（计数偏大，**不会**重复 wake）。
 
 ```bash
-relay gc --yes    # 清理 processed 孤儿
+relay gc --yes
 ```
 
 ### stuck 任务（卡在 active）
 
 ```bash
-# 将卡住的任务从 active 退回 pending，等 relayd 重新 claim
-relay recover hermes
-
-# 指定节点
-relay recover cursor
+relay recover hermes    # 执行方 node（常见）
+# relay recover <node> --task-id <id>
 ```
 
 ### MCP 不工作
@@ -155,7 +152,9 @@ AGENT_RELAY_HOME='\''~/.agent-relay'\'' node /path/to/bin/relay.js send '\''curs
 | **约束** | 建议 | 防止改多了或改错了范围 |
 | **不做** | 建议 | 明确边界，防止 Agent 发散 |
 | **验收标准** | ✓ | 可量化：测试通过、文件存在、命令输出 |
-| **回传命令** | ✓ | 带 taskId 和项目路径，Hermes 跑完直接 send 回来 |
+| **回传命令** | ✓ | prompt 尾部自带；summary 写改了啥、测试结果、commit |
+
+> Hermes 回传后，Cursor 主 Agent 会派 **code-reviewer** 再审一遍再合并（见 `docs/AGENT-CONTRACT.md` §0.2）。
 
 ---
 

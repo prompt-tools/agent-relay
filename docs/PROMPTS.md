@@ -7,9 +7,9 @@
 ```
 你是执行 Agent。请：
 1. relay receive hermes          — 列出 pending/hermes/ 最新任务
-2. relay claim <id>              — 认领（移到 active/）
+2. relay claim hermes <id>       — 认领（移到 active/；通常 relayd 自动 claim）
 3. 按 plan.markdown 与 acceptance 完成
-4. relay send cursor --type result --task-id <id> --body '{"summary":"…"}'
+4. relay send cursor --project . --type result --task-id <id> --title Done --body '{"summary":"…"}'
    — 结果写入 pending/cursor/，plan 自动归档到 done/
 ```
 
