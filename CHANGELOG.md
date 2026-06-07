@@ -7,6 +7,7 @@ All notable changes to agent-relay. Format based on [Keep a Changelog](https://k
 ### Added
 
 - `antigravity-cli` provider (`agy -p` + `--dangerously-skip-permissions`)
+- `relay serve` — local HTTP dashboard (`127.0.0.1:3847`, `/api/watch`, `/api/health`)
 - `relay watch` — terminal observability for active tasks, progress, and relay.log ops
 - Interactive setup TUI (`scripts/setup-tui.mjs`) — numbered role/node menu with confirm
 - Orchestrator mode in `AGENTS.md` — main agent coordinates, subagents implement/review

@@ -49,4 +49,5 @@ node bin/relay.js setup --role receiver --node hermes --yes
 node bin/relay.js send hermes --from cursor --project . --title T --plan-text "## ..."
 node bin/relay.js receive cursor --type result
 node bin/relay.js watch --once
+node bin/relay.js serve
 ```

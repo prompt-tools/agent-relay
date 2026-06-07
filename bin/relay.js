@@ -31,6 +31,7 @@ Usage:
   relay status [--health]
   relay health
   relay watch [--interval <sec>] [--once] [--json]
+  relay serve [--host <addr>] [--port <n>]
   relay recover <node> [--task-id <id>] [--older-than <sec>]
   relay setup [--role sender|receiver|both] [--node <nodeId>] [--dry-run] [--skip-auth]
 
@@ -224,13 +225,45 @@ async function run() {
     return;
   }
 
+  if (cmd === 'serve') {
+    const { startServe } = await import('../src/serve.mjs');
+    const host = flag('--host') || '127.0.0.1';
+    const portRaw = flag('--port');
+    const port = portRaw == null ? 3847 : Number(portRaw);
+    if (!Number.isFinite(port) || port < 0 || port > 65535) {
+      throw new Error('--port must be an integer from 0 to 65535');
+    }
+    const server = startServe(config, { host, port });
+    await new Promise((resolve, reject) => {
+      server.once('error', reject);
+      server.once('listening', resolve);
+    });
+    const addr = server.address();
+    console.log(
+      JSON.stringify(
+        {
+          ok: true,
+          url: `http://${host}:${addr.port}/`,
+          host,
+          port: addr.port,
+        },
+        null,
+        2,
+      ),
+    );
+    const shutdown = () => {
+      server.close(() => process.exit(0));
+    };
+    process.on('SIGTERM', shutdown);
+    process.on('SIGINT', shutdown);
+    return;
+  }
+
   usage();
   process.exitCode = 1;
 }
 
-try {
-  run();
-} catch (e) {
+run().catch((e) => {
   console.error(JSON.stringify({ ok: false, error: e.message }, null, 2));
   process.exitCode = 1;
-}
+});

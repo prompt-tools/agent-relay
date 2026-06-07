@@ -110,6 +110,16 @@
 
 ---
 
+## 2026-06-07 — Phase 3 Task 2: relay serve
+
+**完成**（subagent + 双审查）：
+- `src/serve.mjs` — `/api/watch`, `/api/health`, 内联 HTML 仪表盘
+- `relay serve --host --port`；修复 async run().catch
+
+**测试**：54/54 pass
+
+---
+
 **决策**：用户卸载 GSD/OMX；`AGENT-CONTRACT.md` 只绑定 Superpowers 技能与 Cursor Subagent 类型。
 
 ---
