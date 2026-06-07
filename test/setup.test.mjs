@@ -101,7 +101,12 @@ test('runSetup receiver writes nodes and launchd', async () => {
     assert.equal(result.ok, true);
     assert.ok(existsSync(join(home, 'config.json')));
     assert.ok(existsSync(join(home, 'nodes.yaml')));
-    assert.ok(existsSync(join(la, 'com.agent-relay.relayd.plist')));
+    // launchd plist is only written on macOS
+    if (process.platform === 'darwin') {
+      assert.ok(existsSync(join(la, 'com.agent-relay.relayd.plist')));
+    } else {
+      assert.equal(existsSync(join(la, 'com.agent-relay.relayd.plist')), false);
+    }
   } finally {
     rmSync(home, { recursive: true, force: true });
     rmSync(la, { recursive: true, force: true });
