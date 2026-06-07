@@ -1,6 +1,6 @@
 # Agent 交接包
 
-> 生成时间：2026-06-07 · HEAD `0ba83cc` · 给接替 Agent 用
+> 生成时间：2026-06-07 · HEAD `a589f0c` · 给接替 Agent 用
 
 ## 30 秒上手
 
@@ -19,11 +19,12 @@
 | [agent-relay-handoff-2026-06-07.tar.gz](./agent-relay-handoff-2026-06-07.tar.gz) | 文档+规则+记忆 完整打包 |
 | [memories/](./memories/) | 核心记忆文件副本（免解压） |
 
-## 给新 Agent 的第一条消息（可复制）
+## 给新 Agent 的第一条消息（整段复制）
 
-```
-项目：~/Projects/agent-relay（agent-relay v0.3.0 已发布）
-先读：docs/handoff/SESSION-SNAPSHOT.md → docs/AGENT-CONTRACT.md → docs/MEMORY.md
-本机 E2E 已验收（cursor→hermes）；跨机封存；Hermes 回传必须 code-reviewer（§0.3）
-未完成低优：审计 Batch 3（删 deprecated CLI stub）
+```text
+项目 ~/Projects/agent-relay，v0.3.0 已发布，本机 E2E 已验收。
+先读 docs/handoff/SESSION-SNAPSHOT.md，
+再读 docs/AGENT-CONTRACT.md 和 docs/MEMORY.md。
+Hermes 回传必须 code-reviewer（§0.3）；跨机封存；Batch 3 低优未做。
+完整对话：~/.cursor/projects/Users-klaus-Projects-agent-relay/agent-transcripts/27cbf5fa-6645-444a-b1b1-f0b0921dbb08/
 ```

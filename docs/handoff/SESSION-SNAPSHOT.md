@@ -94,3 +94,15 @@ docs/OPERATIONS.md          # 日常运维一页纸
 ```
 
 含 subagent 子会话；搜索关键词：`Hermes`、`audit`、`E2E`、`cross-machine`、`code-reviewer`。
+
+---
+
+## 给新 Agent 的第一条消息（整段复制）
+
+```text
+项目 ~/Projects/agent-relay，v0.3.0 已发布，本机 E2E 已验收。
+先读 docs/handoff/SESSION-SNAPSHOT.md，
+再读 docs/AGENT-CONTRACT.md 和 docs/MEMORY.md。
+Hermes 回传必须 code-reviewer（§0.3）；跨机封存；Batch 3 低优未做。
+完整对话：~/.cursor/projects/Users-klaus-Projects-agent-relay/agent-transcripts/27cbf5fa-6645-444a-b1b1-f0b0921dbb08/
+```
