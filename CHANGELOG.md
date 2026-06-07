@@ -4,6 +4,30 @@ All notable changes to agent-relay. Format based on [Keep a Changelog](https://k
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-06-07
+
+### Added
+
+- Scoped npm package name `@prompt-tools/agent-relay`
+- `files` field in package.json (bin/, src/, mcp/, scripts/)
+- `author`, `repository`, `homepage`, `bugs` fields
+- Platform guard for launchd (macOS-only, graceful skip on Linux)
+- `command -v` replaced with cross-platform `which`/`where` in setup.mjs
+- English README with installation docs and optional CLI agents table
+- Dynamic MCP version from package.json (no hardcoded string)
+- GitHub Actions CI workflow (Node 20/22 × macOS/Ubuntu)
+- npm publish workflow (triggered on GitHub Release)
+- JSDoc on 8 source files (74 @param tags)
+
+### Changed
+
+- README rewritten in English; Chinese README moved to docs/README-zh.md
+- Config example: `config.example.yaml` replaced with `config.example.json`
+
+### Removed
+
+- Deprecated `relay pull`, `relay complete`, `relay fail` CLI stubs (use `relay send`/`relay receive`)
+
 ## [0.3.0] - 2026-06-07
 
 ### Added
@@ -60,7 +84,8 @@ All notable changes to agent-relay. Format based on [Keep a Changelog](https://k
 - Task files: `{id}.json` (was `{id}.plan.json`)
 - Docs aligned to PRINCIPLES.md / Hermes primary path
 
-[Unreleased]: https://github.com/prompt-tools/agent-relay/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/prompt-tools/agent-relay/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/prompt-tools/agent-relay/releases/tag/v0.4.0
 [0.3.0]: https://github.com/prompt-tools/agent-relay/releases/tag/v0.3.0
 [0.2.0]: https://github.com/prompt-tools/agent-relay/releases/tag/v0.2.0
 [0.1.0]: https://github.com/prompt-tools/agent-relay/releases/tag/v0.1.0

@@ -25,8 +25,9 @@
 | CI 闭环 | `test/e2e-relayd.test.mjs` + **62/62** |
 | Live 验收 | `relay smoke --project .` |
 | Hermes 派活闭环 | v0.3.0 prep + audit batch1（commit → code-reviewer → fix） |
-| MCP 版本 | `SERVER_INFO.version` = **0.3.0**（与 package.json 一致） |
+| MCP 版本 | SERVER_INFO.version 动态读取 package.json（P0 修复）|
 | CI/CD 双 workflow | ci.yml（push/PR）+ publish.yml（release）|
+| v0.4.0 准备就绪 | version bump + CHANGELOG done；npm publish 待 org/token |
 
 ## 踩坑与经验
 

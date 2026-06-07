@@ -216,6 +216,16 @@
 
 ---
 
+## 2026-06-07 — v0.4.0 发布准备
+
+**完成**（S 档）：
+- package.json version bump 0.3.0 → 0.4.0
+- CHANGELOG.md 填写 [0.4.0] 条目（P0+P1 distribution readiness + audit batches 1/2/3 归纳）
+
+**待办**：npm org 创建 + NPM_TOKEN 配置后方可 publish。
+
+---
+
 | 日期 | 决策 | 原因 |
 |------|------|------|
 | 2026-06-07 | E2E 主路径改 hermes | 用户无 codex 额度 |
