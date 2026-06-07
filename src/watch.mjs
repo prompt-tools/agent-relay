@@ -91,7 +91,7 @@ export function formatWatchText(snapshot) {
   } else {
     for (const task of snapshot.active) {
       lines.push(
-        `  [${task.node}] ${task.id} ${task.type} ${task.from ?? '-'}→${task.to ?? '-'} ${task.title}`,
+        `  [${task.node}] ${task.id} ${task.type} ${task.from ?? '-'}→${task.to ?? '-'} ${task.title ?? '(no title)'}`,
       );
     }
   }
@@ -102,7 +102,7 @@ export function formatWatchText(snapshot) {
   } else {
     for (const task of snapshot.progressPending) {
       lines.push(
-        `  [${task.node}] ${task.id} taskId=${task.taskId || '-'} ${task.title}`,
+        `  [${task.node}] ${task.id} taskId=${task.taskId || '-'} ${task.title ?? '(no title)'}`,
       );
     }
   }
@@ -120,15 +120,19 @@ export function formatWatchText(snapshot) {
 
 export function runWatch(config, { intervalSec = 5, once = false, json = false } = {}) {
   const emit = () => {
-    const snapshot = buildWatchSnapshot(config);
-    if (json) {
-      console.log(JSON.stringify(snapshot, null, 2));
-      return;
+    try {
+      const snapshot = buildWatchSnapshot(config);
+      if (json) {
+        console.log(JSON.stringify(snapshot, null, 2));
+        return;
+      }
+      if (!once && process.stdout.isTTY) {
+        process.stdout.write('\x1b[2J\x1b[H');
+      }
+      console.log(formatWatchText(snapshot));
+    } catch (err) {
+      console.error(`[watch] error: ${err.message}`);
     }
-    if (!once && process.stdout.isTTY) {
-      process.stdout.write('\x1b[2J\x1b[H');
-    }
-    console.log(formatWatchText(snapshot));
   };
 
   emit();

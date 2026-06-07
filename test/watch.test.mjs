@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 import { initConfig } from '../src/config.mjs';
 import { sendTask, claimTask } from '../src/store.mjs';
 import { layout } from '../src/paths.mjs';
-import { buildWatchSnapshot, formatWatchText } from '../src/watch.mjs';
+import { buildWatchSnapshot, formatWatchText, runWatch } from '../src/watch.mjs';
 
 test('buildWatchSnapshot aggregates active, progress, counts, and log ops', () => {
   const home = mkdtempSync(join(tmpdir(), 'agent-relay-watch-'));
@@ -99,6 +99,59 @@ test('formatWatchText renders human-readable panel sections', () => {
   assert.match(text, /\[cursor\] p1 taskId=plan1 Working/);
   assert.match(text, /── recent relay.log ops ──/);
   assert.match(text, /claim plan1/);
+});
+
+test('formatWatchText uses placeholder when title is missing', () => {
+  const snapshot = {
+    ts: '2026-06-07T12:00:00.000Z',
+    home: '/tmp/relay',
+    nodeId: 'cursor',
+    counts: { hermes: { pending: 0, active: 1, done: 0, failed: 0 } },
+    active: [
+      {
+        node: 'hermes',
+        id: 'plan1',
+        type: 'plan',
+        from: 'cursor',
+        to: 'hermes',
+      },
+    ],
+    progressPending: [
+      {
+        node: 'cursor',
+        id: 'p1',
+        taskId: 'plan1',
+      },
+    ],
+    recentOps: [],
+  };
+
+  const text = formatWatchText(snapshot);
+  assert.match(text, /\[hermes\] plan1 plan cursor→hermes \(no title\)/);
+  assert.match(text, /\[cursor\] p1 taskId=plan1 \(no title\)/);
+});
+
+test('runWatch emit catches snapshot errors and writes to stderr', () => {
+  const chunks = [];
+  const origWrite = process.stderr.write.bind(process.stderr);
+  process.stderr.write = (chunk, ...args) => {
+    chunks.push(String(chunk));
+    return origWrite(chunk, ...args);
+  };
+  try {
+    runWatch(
+      {
+        get home() {
+          throw new Error('snapshot fail');
+        },
+        nodes: [],
+      },
+      { once: true },
+    );
+  } finally {
+    process.stderr.write = origWrite;
+  }
+  assert.match(chunks.join(''), /\[watch\] error: snapshot fail/);
 });
 
 test('buildWatchSnapshot returns empty ops when log missing', () => {

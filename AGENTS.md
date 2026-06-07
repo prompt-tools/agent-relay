@@ -68,7 +68,16 @@
 | 审查 | `code-reviewer` / `gsd-code-reviewer` | PASS/WARN + 必修复项 |
 | 探索 | `explore` | 文件路径 + 结论，不贴全文 |
 
-流程：**拆 Task → 派 subagent 实现 → 派 subagent 审查 → 主 Agent 合并结论 → npm test 证据 → 落盘**。
+流程：**拆 Task → 派 subagent 实现 → 两阶段审查 → 主 Agent 合并结论 → npm test 证据 → 落盘**。
+
+### 审查协议（Mandatory，不可跳过）
+
+每个 Task 完成后，主 Agent **必须**依次派 subagent（不可合并成一次敷衍 review）：
+
+1. **规格审查**（`generalPurpose` / spec reviewer）— 对照 Task checklist 逐项 PASS/FAIL
+2. **质量审查**（`code-reviewer`）— 按 `requesting-code-review` 提供 `BASE_SHA`/`HEAD_SHA` 与需求摘要
+3. **修复** — Important/Critical 派 `gsd-code-fixer`；修复后再派 quality reviewer **re-review**
+4. **整批收尾** — 全部 Task 完成后，再派一次 `code-reviewer` 覆盖整个 commit range
 
 主 Agent 回复用户时只带结论与 citation，不带 subagent 的完整 tool 输出。
 
