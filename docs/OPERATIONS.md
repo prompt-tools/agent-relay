@@ -154,11 +154,19 @@ AGENT_RELAY_HOME='\''~/.agent-relay'\'' node /path/to/bin/relay.js send '\''curs
 | **验收标准** | ✓ | 可量化：测试通过、文件存在、命令输出 |
 | **回传命令** | ✓ | prompt 尾部自带；summary 写改了啥、测试结果、commit |
 
-> Hermes 回传后，Cursor 主 Agent 会派 **code-reviewer** 再审一遍再合并（见 `docs/AGENT-CONTRACT.md` §0.2）。
+> Hermes 回传后，Cursor 主 Agent 会派 **code-reviewer** 再审一遍再合并（见 `docs/AGENT-CONTRACT.md` §0.3）。
 
 ---
 
 ## 速查卡
+
+### CLI 分层
+
+| 层 | 命令 |
+|----|------|
+| **Daily** | `setup`, `send`, `receive`, `health`, `smoke` |
+| **Ops** | `watch`, `gc`, `recover`, `serve` |
+| **Advanced** | `list`, `claim`, `show`, `init`, `status` |
 
 | 场景 | 命令 |
 |------|------|

@@ -19,9 +19,21 @@
 
 ---
 
-## 0.1 新功能全链路（Research-First，MUST 按序）
+## 0.1 变更档位 S / M / L（先选档，再选流程）
 
-**禁止** 跳过调研直接写 plan 或写代码。用户已授权自主推进时，**不必逐步询问**，但 **不可跳过审查 Subagent**。
+| 档位 | 适用 | 流程 |
+|------|------|------|
+| **S** | 单文件文档/措辞、version 对齐、review 后小 fix | §1.2 **轻量**：Implementer → **一轮** `code-reviewer` → `npm test` → WORKLOG |
+| **M** | 新 CLI 子命令、多文件功能、测试扩展 | `writing-plans` **单文件 plan**（Context 节可代替独立 research）→ Implementer → `code-reviewer` → `npm test` |
+| **L** | 协议/schema、新 provider、跨机、安全面 | **完整 §0.1 Research-First 九步** |
+
+**MUST NOT（全档位）：** 无 fresh `npm test` 声称完成；Hermes 回传未 `code-reviewer` 就 push（§0.3）。
+
+---
+
+## 0.2 新功能全链路（Research-First — **L 档专用**）
+
+**L 档 MUST 按序。** M/S 档见 §0.1。用户已授权自主推进时**不必逐步询问**，但 **不可跳过审查 Subagent**。
 
 ```
 ① 调研 Research     → docs/research/YYYY-MM-DD-<topic>.md
@@ -49,7 +61,7 @@
 
 ---
 
-## 0.2 派给 Hermes / 外部执行方（MUST）
+## 0.3 派给 Hermes / 外部执行方（MUST）
 
 目标已明确时，**主 Agent 自主推进**，不必向用户逐步确认。仅当破坏性操作或范围不明时才问用户。
 
@@ -67,7 +79,7 @@
 | 步骤 | Subagent |
 |------|----------|
 | ④ 审 Hermes | **`code-reviewer`**（第三方，非 Hermes 自审） |
-| ⑤ 修 Critical/Important | Implementer / `gsd-code-fixer` |
+| ⑤ 修 Critical/Important | `generalPurpose` 或 Implementer 重派 |
 
 **MUST NOT：** Hermes result 未审就 merge/push；把「要不要发布」甩给用户（ROADMAP 已列发布项则直接做）。
 
@@ -92,23 +104,27 @@
 
 ### 1.2 每个 Task 内（`subagent-driven-development`）
 
+**S 档（轻量）：** Implementer → `code-reviewer`（BASE/HEAD）→ `npm test` → WORKLOG。可跳过 generalPurpose spec 审与整批终审。
+
+**M/L 档（完整）：**
+
 ```
 ① Read implementer-prompt.md → 派 Implementer Subagent
-② Read spec-reviewer-prompt.md → 派 Spec Reviewer（generalPurpose）
+② Read spec-reviewer-prompt.md → 派 Spec Reviewer（generalPurpose）— M 档可合并进 ③
 ③ Read requesting-code-review → 派 code-reviewer（带 BASE_SHA / HEAD_SHA）
-④ Important/Critical → 派 Fixer Subagent → ③ re-review
+④ Important/Critical → 派 Fixer（generalPurpose）→ ③ re-review
 ⑤ Read verification-before-completion → fresh npm test
 ⑥ WORKLOG 一行
-⑦ 全部 Task 完 → 再派 code-reviewer 终审整个 range
+⑦ L 档全部 Task 完 → 再派 code-reviewer 终审整个 range
 ```
 
 | 步骤 | Superpowers | Cursor Subagent |
 |------|-------------|-----------------|
-| 实现 | `implementer-prompt.md` | `gsd-executor` 或 `generalPurpose` |
-| 规格审查 | `spec-reviewer-prompt.md` | `generalPurpose` |
+| 实现 | `implementer-prompt.md` | `generalPurpose` |
+| 规格审查 | `spec-reviewer-prompt.md` | `generalPurpose`（M/L；S 可省略） |
 | 质量审查 | `requesting-code-review` | **`code-reviewer`** |
 | 收到 review 意见时 | **`receiving-code-review`** | 主 Agent 判断是否采纳再派 Fixer |
-| 修 Important+ | — | `gsd-code-fixer` 或 Implementer 重派 |
+| 修 Important+ | — | `generalPurpose` 或 Implementer 重派 |
 | 声称完成 | **`verification-before-completion`** | 主 Agent 跑 `npm test` |
 
 **MUST NOT**（Superpowers Red Flags）：
@@ -136,10 +152,8 @@
 | subagent_type | 何时派 |
 |---------------|--------|
 | **`code-reviewer`** | 每 Task 质量审查；整批终审 |
-| **`generalPurpose`** | Spec 审查；小 Task 实现 |
-| **`gsd-executor`** | 按计划实现（多文件 Task） |
-| **`gsd-code-fixer`** | 修 review 的 Important/Critical |
-| **`explore`** | 查代码结构；只返路径+结论 |
+| **`generalPurpose`** | Spec 审查；小 Task 实现；修 review |
+| **`explore`** | 查代码结构；只读审计 |
 
 主 Agent **MUST NOT** 自己写大 diff 代替 Implementer。
 
@@ -153,7 +167,7 @@
 - Ruflo 联邦主路径  
 - 默认 codex E2E（主路径 **cursor → hermes**）  
 - 四 IDE 全家桶 setup  
-- 无 ROADMAP 授权的 Docker / 跨机 / Web 面板  
+- 无 ROADMAP 授权的 Docker / **跨机**  
 - 新增 npm 运行时依赖  
 - CLI 与 MCP 不同构  
 
@@ -171,10 +185,11 @@
 ## 5. 回复前自检
 
 1. 是否 Read 了该步 Superpowers SKILL.md？  
-2. 本 Task 是否 **Spec + Quality** 各派一次 Subagent？  
-3. 是否按 **`verification-before-completion`** 刚跑过 `npm test`？  
-4. WORKLOG 写了吗？  
-5. 上下文是否该触发 §1.3 落盘+收窄？  
+2. 本 Task 档位（S/M/L）对应的审查是否做完？  
+3. Hermes 回传是否已 `code-reviewer`？  
+4. 是否按 **`verification-before-completion`** 刚跑过 `npm test`？  
+5. **MEMORY.md + WORKLOG** 是否已同步？  
+6. 上下文是否该触发 §1.3 落盘+收窄？  
 
 ---
 
@@ -195,8 +210,8 @@
 
 | 文件 | 用途 |
 |------|------|
-| **`docs/AGENT-CONTRACT.md`** | 本文件 |
-| `docs/research/` | 调研结论（先于 design/plan） |
+| **`docs/AGENT-CONTRACT.md`** | 本文件（**真源**：S/M/L + Hermes §0.3） |
+| `docs/research/` | 调研（L 档；含 `2026-06-07-full-repo-audit.md`） |
 | `docs/superpowers/specs/` | 设计稿（先于 plan） |
 | `docs/superpowers/plans/` | 实现计划 |
 | `docs/PRINCIPLES.md` | 产品原则 |

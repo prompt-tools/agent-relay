@@ -1,105 +1,87 @@
 # Project Memory
 
-> 本文件是 **agent-relay 项目级记忆**：决策、踩坑、约束。新会话先读 `PRINCIPLES.md` + 本文件。
+> 项目级记忆：决策、踩坑、约束。新会话：**PRINCIPLES.md + 本文件 + WORKLOG 尾部**。
 
 ## 核心决策（不可忘）
 
-1. **对称 send/receive**，无 inbox/pull/complete。
-2. **主 E2E 路径：cursor → hermes**（不是 codex；用户无 codex 额度）。
-3. **唤醒是核心 UX**，不是可选；靠 `relayd` + provider spawn。
-4. **按角色 setup**（sender/receiver/both），不要四 IDE 全家桶。
-5. **v1 = CLI + relayd + MCP**，不做 Docker / 联邦。
-6. **跨机同步封存**（2026-06-07）：调研/设计/计划保留在 `docs/archive/cross-machine-sync/`；**本机 E2E 稳定前不写 `relay sync` 代码**。
-7. **v0.3.0 已发布**（2026-06-07）：本机目标达成；Hermes 可派活，**回传必须经 code-reviewer**，主 Agent **无需用户确认**即可 push/tag（见 AGENT-CONTRACT §0.2）。
+1. **对称 send/receive**，无 inbox/pull/complete（`relay pull|complete|fail` 仅为 deprecated stub）。
+2. **主 E2E：cursor → hermes**（非 codex 默认）。
+3. **唤醒 = relayd + provider spawn**；prompt 尾部须含完整 `relay send` 命令。
+4. **按角色 setup**（sender/receiver/both），非四 IDE 全家桶。
+5. **零 npm 运行时依赖**；CLI 与 MCP 同构（`store.mjs`）。
+6. **跨机封存** → `docs/archive/cross-machine-sync/`（方案 B→A，**未写代码**）。
+7. **v0.3.0 已发布**（2026-06-07）：本机目标达成。
+8. **编排真源** → `docs/AGENT-CONTRACT.md`：**S/M/L 档位** + Hermes **§0.3 必审** + 自主 push（少问用户）。
+9. **CodeGraph**（2026-06-07）：项目根 `codegraph init`；MCP `user-codegraph` 查询；`.codegraph/` **不入 git**。
 
 ## 已验证事实
 
 | 事实 | 证据 |
 |------|------|
-| Hermes 非交互唤醒 | `hermes chat -q "..." -Q --accept-hooks --yolo` |
-| 回传 = 再次 send | E2E `HELLO RELAY` 约 8s；**PROD3 OK** live smoke ~12s（2026-06-07） |
-| relayd 去重 | `relayd.processed.json` + claim |
-| MCP 与 CLI 同构 | `mcp/server.mjs` 调同一 `store.mjs` |
-| project.yaml 可省略 to | `.agent-relay/project.yaml` → `defaultTo: hermes` |
+| Hermes 非交互唤醒 | `hermes chat -q ... -Q --accept-hooks --yolo` |
+| 回传 = send result | PROD2/PROD3 OK；`archivePlanOnResult` → `done/` |
+| relayd 去重 | `processed` + claim；orphan → `relay gc` |
+| CI 闭环 | `test/e2e-relayd.test.mjs` + **62/62** |
+| Live 验收 | `relay smoke --project .` |
+| Hermes 派活闭环 | v0.3.0 prep + audit batch1（commit → code-reviewer → fix） |
+| MCP 版本 | `SERVER_INFO.version` = **0.3.0**（与 package.json 一致） |
 
 ## 踩坑与经验
 
-### 协议层简单，产品层难
+### launchd / PATH
 
-- 文件队列几百行能写完；**合适**要靠 setup OAuth、失败诊断、provider 维护。
-- 「快做完」≠「可天天用」。
+- `nodes.yaml` 存 **hermes 绝对路径**；plist 注入 PATH；spawn 须监听 `error`。
 
-### Provider 必须跟 CLI 对齐
+### processed 竞态
 
-- 每个 Agent 的 headless 入口不同：`hermes chat -q`、`codex exec`、`agent`、`agy -p`。
-- spawn 的 prompt **必须带完整 `relay send` 命令**（含 `AGENT_RELAY_HOME` 和 `relay.js` 绝对路径），否则 Hermes 不会回传。
+- `handleWakeFailure` 须 **delete processed**；`recoverTask` 须回写 JSON。
 
-### Setup 分角色
+### orphan pending
 
-- **sender**：合并 `~/.cursor/mcp.json`，provider=manual，提示重启 Cursor。
-- **receiver**：写 `nodes.yaml`、launchd、`hermes login`（交互时）。
-- `--skip-auth` 给 CI/已登录用户；`--yes` 非交互。
+- `id ∈ processed` 且仍在 `pending/` → 计数脏；**不会**双 wake → `relay gc --yes`。
 
-### launchd 没有交互式 PATH
+### 文档勿用 v1 话术
 
-- `spawn hermes ENOENT`：launchd 环境找不到 `~/.local/bin/hermes`。
-- **修复**：`nodes.yaml` 存 **绝对路径**；launchd plist 注入 `PATH`。
-- spawn 必须监听 `error` 事件，否则 relayd 会崩。
+- **`docs/PROMPTS.md`** 已对齐 v2（2026-06-07 审计 Batch 1）；Hermes 若读旧 complete/inbox 会做错。
+- 配置示例：**`config.example.json`**（非 yaml）。
 
-### 失败重试与 processed 竞态
+### shell 引号
 
-- `tick` 在 spawn 拿到 pid 后立即写 `processed`；异步 `error` 事件会触发 `handleWakeFailure`。
-- **必须**在 recover 后从 `processed` 删除 taskId，否则任务永久跳过。
-- `recoverTask` 移动文件后须 **回写 JSON**（清 `claimedAt`、设 `status: pending`）。
+- `relaySendInstruction` 路径/node 单引号包裹。
 
-### relay send 指令须 shell 引号
+### 全仓库审计（2026-06-07）
 
-- `relaySendInstruction` 中 `home`、`relayBin`、`from`、`task-id`、`projectPath` 用单引号包裹，避免空格路径或 shell 元字符破坏命令。
+- 报告：`docs/research/2026-06-07-full-repo-audit.md`
+- 架构 hub：`store.mjs`；provider 表硬编码在 `relayd.mjs`
+- Batch 1 ✅ PROMPTS、config.example、MCP version、RELIABILITY
+- Batch 2 ✅ CONTRACT S/M/L、AGENTS/rule 瘦身
+- Batch 3 ⏸ 删 deprecated stub、合并 relayLog（未做，低优）
 
-### 工具调用会超时
+### 变更档位（CONTRACT §0.1）
 
-- 长轮询 / MCP move 可能被中断；**直接写文件**比反复 Shell 更稳。
-
-### 技能驱动开发
-
-- 先 `writing-plans`，再 `subagent-driven-development`（每 Task spec + quality 审核）。
-- 用户明确要求：**每个任务前找合适技能**。
-
-### 上下文预算（用户 2026-06-07）
-
-- 当上下文接近满（>75% 或出现 conversation summary）时，**自动**执行精简，保持注意力在当前任务。
-- 顺序：落盘 MEMORY/WORKLOG → commit（若适用）→ 以文档为真源、停读 transcript（无 handoff 技能，见 AGENT-CONTRACT §1.3）。
-- 详见 `AGENTS.md`「上下文预算」；已写入 `.cursor/rules/agent-relay.mdc`。
-
-### 编排模式（用户 2026-06-07）
-
-- **仅 Superpowers + Cursor Subagent**（GSD/OMX 已卸载，不再引用）。
-- 契约：**`docs/AGENT-CONTRACT.md`** — 技能映射 + Subagent 类型 + Red Flags。
-- 新会话先 **`using-superpowers`**。
+| 档 | 何时 |
+|----|------|
+| **S** | 文档/小 fix → 一轮 code-reviewer |
+| **M** | 新子命令/多文件 → plan + code-reviewer |
+| **L** | 协议/provider/跨机 → 完整 Research-First 九步 |
 
 ## 明确不做
 
-- Ruflo federation 主路径
-- v1 四 provider 齐测
-- Codex 作为默认 E2E（除非用户改口）
-- 用「代码少」冒充「配置简单」
+- Ruflo 联邦、跨机 sync（封存）、Docker、inbox 语义回归
 
 ## 文件索引
 
 | 用途 | 文件 |
 |------|------|
-| **Agent 硬约束** | **`docs/AGENT-CONTRACT.md`** |
-| 原则 | `docs/PRINCIPLES.md` |
-| 范围 | `docs/FOCUS.md` |
-| 操作 | `docs/SETUP.md`, `docs/E2E.md` |
-| 计划 | `docs/superpowers/plans/` |
-| 工作记录 | `docs/WORKLOG.md` |
+| **契约** | `docs/AGENT-CONTRACT.md` |
+| **记忆** | 本文件 |
+| **运维** | `docs/OPERATIONS.md` |
+| **E2E** | `docs/E2E.md` |
+| **审计** | `docs/research/2026-06-07-full-repo-audit.md` |
+| **跨机（封存）** | `docs/archive/cross-machine-sync/` |
+| **进展** | `docs/WORKLOG.md` |
+| **范围** | `docs/FOCUS.md` · `docs/ROADMAP.md` |
 
-## 下一步（v1.1+）
+## 维护态（v0.3.0+）
 
-- [x] 真机 `~/.agent-relay` 长期跑 relayd
-- [x] `cursor-agent` provider
-- [x] 失败重试 + `relay recover`
-- [x] setup TUI（编号菜单 + 确认）
-- [x] `type:progress` 可观测（`relay watch`）
-- [x] GitHub `v0.2.0` 发布
+日常：`relay health` · `npm test` · 偶发 `relay smoke`。新 Phase 走 L 档或封存项恢复条件。

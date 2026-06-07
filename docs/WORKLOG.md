@@ -185,18 +185,33 @@
 ## 2026-06-07 — v0.3.0 发布 + 文档对齐
 
 - GitHub Release [v0.3.0](https://github.com/prompt-tools/agent-relay/releases/tag/v0.3.0)
-- AGENT-CONTRACT §0.2：Hermes 派活 + 第三方审查 + **无需用户逐步确认**
+- AGENT-CONTRACT §0.3：Hermes 派活 + 第三方审查 + **无需用户逐步确认**
 - README / FOCUS / VISION / E2E checklist 与现状对齐
 
 ---
 
-## 决策日志
+## 2026-06-07 — 全仓库审计 + Batch 1/2 收尾
+
+**CodeGraph**：`codegraph init`（392 nodes）；`.codegraph/` 入 gitignore。
+
+**审计**：`docs/research/2026-06-07-full-repo-audit.md`；3 Subagent + Hermes Batch 1（`1679ebb` → review → `2b045dd`）。
+
+**Batch 2**：
+- CONTRACT **S/M/L**（§0.1）；Research-First 仅 L 档
+- AGENTS.md / cursor rule 瘦身为指针
+- **MEMORY.md** 全量同步（审计、CodeGraph、档位、维护态）
+
+**测试**：62/62
+
+---
 
 | 日期 | 决策 | 原因 |
 |------|------|------|
 | 2026-06-07 | E2E 主路径改 hermes | 用户无 codex 额度 |
 | 2026-06-07 | nodes.yaml 用 JSON 非 YAML | v1 零依赖 |
 | 2026-06-07 | 技能驱动：writing-plans + subagent-driven-development | 用户要求规范流程 |
+| 2026-06-07 | CONTRACT S/M/L 档位 | 全仓审计：九步对小改过重 |
+| 2026-06-07 | CodeGraph 本地索引 | MCP 查询；`.codegraph/` 入 gitignore |
 
 ---
 

@@ -10,7 +10,7 @@
 
 1. `relay health` 绿 · `npm test` 绿 · 需要时 `relay smoke`
 2. 新功能走 **Research-First**（`docs/AGENT-CONTRACT.md` §0.1）
-3. 派 Hermes 干活 → **code-reviewer 必审** → 自主 merge/release（§0.2）
+3. 派 Hermes 干活 → **code-reviewer 必审** → 自主 merge/release（§0.3）
 4. **跨机同步** — **封存** → `docs/archive/cross-machine-sync/`
 
 ## 已否决方向（勿再讨论/实现）

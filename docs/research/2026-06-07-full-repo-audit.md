@@ -80,14 +80,16 @@ bin/relayd.js ──► src/relayd.mjs ──► providers/*.mjs
 ## 5. 建议执行顺序（Hermes / 主 Agent）
 
 **Batch 1（P0–P1，代码+文档小改）**
-- [ ] 重写 `docs/PROMPTS.md` → v2 send/receive/hermes 话术
-- [ ] 删除或替换 `config.example.yaml` → `config.example.json`
-- [ ] `mcp/server.mjs` version → 0.3.0
-- [ ] `RELIABILITY.md` complete 措辞 → result/archive
+- [x] 重写 `docs/PROMPTS.md` → v2 send/receive/hermes 话术
+- [x] 删除 `config.example.yaml` → `config.example.json`
+- [x] `mcp/server.mjs` version → 0.3.0
+- [x] `docs/RELIABILITY.md` complete 措辞 → result/archive
+- [x] code-reviewer 修正 PROMPTS CLI 语法（`2b045dd`）
 
 **Batch 2（P2，契约）**
-- [ ] `AGENT-CONTRACT.md` 增加 S/M/L 档位
-- [ ] 合并 AGENTS.md / cursor rule 重复
+- [x] `AGENT-CONTRACT.md` 增加 S/M/L 档位（§0.1）；Research-First 降为 L 档
+- [x] 合并 AGENTS.md / `.cursor/rules/agent-relay.mdc` 为指针
+- [x] `MEMORY.md` / `WORKLOG` 同步审计与 CodeGraph
 
 **Batch 3（不做除非用户要求）**
 - [ ] 删除 deprecated CLI stub

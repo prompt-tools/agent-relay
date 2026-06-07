@@ -26,7 +26,7 @@ relay send hermes --project . --title "任务标题" --plan-text "## 步骤…"
 
 ```
 relay receive cursor --type result
-读 pending/cursor/ 最新 result.json，继续下一步计划。
+读 pending/cursor/ 最新 result 任务（type=result），继续下一步计划。
 ```
 
 ## Codex / Antigravity

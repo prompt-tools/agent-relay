@@ -5,33 +5,15 @@ alwaysApply: true
 
 # agent-relay
 
-## 体系（仅此两套）
+真源：**`docs/AGENT-CONTRACT.md`** · 记忆：**`docs/MEMORY.md`**
 
-- **Superpowers**：Read SKILL.md 再动手（`using-superpowers` 起手）
-- **Cursor Subagent**：实现 / 双审查 / 修 review / explore
+## 必守
 
-不用 GSD、OMX 或其它技能库。
-
-## 必读
-
-`docs/AGENT-CONTRACT.md` → `docs/PRINCIPLES.md` → `docs/MEMORY.md`
-
-## 新功能
-
-Research-First §0.1：调研 → 审 → 设计 → 审 → 计划 → 审 → 实现 → 再审（见 AGENT-CONTRACT）
-
-## 每 Task
-
-`subagent-driven-development`：Implementer → spec（generalPurpose）→ quality（**code-reviewer** + BASE/HEAD SHA）→ `verification-before-completion`（fresh `npm test`）
-
-## 主 Agent
-
-只编排、落盘、汇报；不写大 diff。
+- 先 **`using-superpowers`**，再按 CONTRACT **S/M/L** 选流程
+- Hermes 回传 → **`code-reviewer` 必审**（§0.3）→ 自主 push，少问用户
+- 完成 → fresh **`npm test`** + 同步 **MEMORY + WORKLOG**
+- 主 Agent 不写大 diff；禁止 inbox/Ruflo/四 IDE 全家桶
 
 ## 产品
 
-send/receive only；E2E **cursor → hermes**；零新 npm 依赖
-
-## 禁止
-
-跳过双审查、无测试说完成、inbox/Ruflo/四 IDE 全家桶
+send/receive · E2E **cursor → hermes** · 跨机 **封存**
