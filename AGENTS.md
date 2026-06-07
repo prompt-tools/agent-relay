@@ -51,7 +51,26 @@
 
 **不要**用 `caveman` 做上下文管理（那是沟通风格，不是记忆整理）。
 
-## 不要
+## 编排模式（主 Agent 只管主线）
+
+**主 Agent（编排者）**只负责：
+
+- 读 `MEMORY` / `WORKLOG` / `ROADMAP`，对齐目标与优先级
+- 拆 Task、定验收标准、决定先后
+- 向用户汇报进展与阻塞
+- 落盘 MEMORY/WORKLOG、触发 commit/release
+
+**Subagent 负责**（主 Agent **不**自己写大段实现/不自己跑完整 review diff）：
+
+| 类型 | subagent | 产出 |
+|------|----------|------|
+| 实现 | `gsd-executor` / `generalPurpose` | 代码 + 测试 + 简短摘要 |
+| 审查 | `code-reviewer` / `gsd-code-reviewer` | PASS/WARN + 必修复项 |
+| 探索 | `explore` | 文件路径 + 结论，不贴全文 |
+
+流程：**拆 Task → 派 subagent 实现 → 派 subagent 审查 → 主 Agent 合并结论 → npm test 证据 → 落盘**。
+
+主 Agent 回复用户时只带结论与 citation，不带 subagent 的完整 tool 输出。
 
 - 恢复 inbox/pull/complete
 - 引入 Ruflo 联邦为主路径

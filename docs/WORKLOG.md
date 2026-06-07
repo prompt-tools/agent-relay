@@ -88,7 +88,17 @@
 
 ---
 
-## 2026-06-07 — 上下文预算协议
+## 2026-06-07 — Phase 2 收尾 + 编排模式
+
+**完成**（subagent 实现，主 Agent 编排）：
+- `relay watch` — progress/active/log 终端面板
+- setup TUI — 编号菜单 + y/n 确认
+- 编排模式写入 `AGENTS.md` / Cursor rules
+- 审查 LOW 修复：watch SIGTERM、active 字段 fallback
+
+**测试**：43/43 pass
+
+---
 
 **完成**：
 - `AGENTS.md` + `.cursor/rules/agent-relay.mdc` — 上下文 >75% 时自动落盘/收窄/handoff

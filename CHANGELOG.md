@@ -4,6 +4,12 @@ All notable changes to agent-relay. Format based on [Keep a Changelog](https://k
 
 ## [Unreleased]
 
+### Added
+
+- `relay watch` — terminal observability for active tasks, progress, and relay.log ops
+- Interactive setup TUI (`scripts/setup-tui.mjs`) — numbered role/node menu with confirm
+- Orchestrator mode in `AGENTS.md` — main agent coordinates, subagents implement/review
+
 ## [0.2.0] - 2026-06-07
 
 ### Added

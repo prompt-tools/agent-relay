@@ -30,6 +30,7 @@ Usage:
   relay show <taskId>
   relay status [--health]
   relay health
+  relay watch [--interval <sec>] [--once] [--json]
   relay recover <node> [--task-id <id>] [--older-than <sec>]
   relay setup [--role sender|receiver|both] [--node <nodeId>] [--dry-run] [--skip-auth]
 
@@ -197,6 +198,29 @@ async function run() {
       return;
     }
     console.log(JSON.stringify(status(config), null, 2));
+    return;
+  }
+
+  if (cmd === 'watch') {
+    const { runWatch } = await import('../src/watch.mjs');
+    const intervalRaw = flag('--interval');
+    const intervalSec = intervalRaw == null ? 5 : Number(intervalRaw);
+    if (!Number.isFinite(intervalSec) || intervalSec <= 0) {
+      throw new Error('--interval must be a positive number of seconds');
+    }
+    const timer = runWatch(config, {
+      intervalSec,
+      once: args.includes('--once'),
+      json: args.includes('--json'),
+    });
+    if (timer) {
+      const shutdown = () => {
+        clearInterval(timer);
+        process.exit(0);
+      };
+      process.on('SIGTERM', shutdown);
+      process.on('SIGINT', shutdown);
+    }
     return;
   }
 

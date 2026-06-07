@@ -31,6 +31,12 @@ alwaysApply: true
 4. 会话过长 → `handoff` 技能写交接 + 建议技能
 5. 回复精简，大段代码用 citation 不重复粘贴
 
+## 编排（主 Agent 只管主线）
+
+- **主 Agent**：拆 Task、优先级、对用户汇报、MEMORY/WORKLOG/commit
+- **Subagent**：实现（gsd-executor/generalPurpose）、审查（code-reviewer）、探索（explore）
+- 主 Agent 不自己写大 diff、不吞完整 review 输出；只合并 subagent 摘要
+
 ## 禁止
 
 Ruflo 联邦、四 IDE 全家桶 setup、恢复 pull/complete、无测试的「做完了」。

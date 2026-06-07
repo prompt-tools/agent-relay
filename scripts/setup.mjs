@@ -3,8 +3,8 @@ import { join, dirname, resolve } from 'node:path';
 import { homedir } from 'node:os';
 import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import readline from 'node:readline/promises';
 import { stdin as input, stdout as output } from 'node:process';
+import { runSetupTui } from './setup-tui.mjs';
 import { initConfig } from '../src/config.mjs';
 import { setNode } from '../src/nodes.mjs';
 import { resolveHome } from '../src/paths.mjs';
@@ -136,21 +136,18 @@ export function configureNodes(home, { role, nodeId, detected }) {
 
 export async function promptInteractive({ role, nodeId, detected }) {
   if (!input.isTTY) return { role, nodeId };
-  const rl = readline.createInterface({ input, output });
-  try {
-    output.write('\nagent-relay setup\n');
-    const roleAns = (await rl.question(`Role [sender/receiver/both] (${role}): `)).trim();
-    const nodeAns = (await rl.question(`Node id (${nodeId}): `)).trim();
-    if (detected.length) {
-      output.write(`Detected CLIs: ${detected.map((d) => d.key).join(', ')}\n`);
-    }
-    return {
-      role: roleAns || role,
-      nodeId: nodeAns || nodeId,
-    };
-  } finally {
-    rl.close();
+  const result = await runSetupTui({
+    role,
+    nodeId,
+    detected,
+    input,
+    output,
+    isTTY: true,
+  });
+  if (!result.confirmed) {
+    throw new Error('Setup cancelled');
   }
+  return { role: result.role, nodeId: result.nodeId };
 }
 
 export async function runSetup(options = {}) {

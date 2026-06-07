@@ -69,6 +69,12 @@
 - 顺序：落盘 MEMORY/WORKLOG → commit（若适用）→ 以文档为真源、停读 transcript → 必要时 `handoff`。
 - 详见 `AGENTS.md`「上下文预算」；已写入 `.cursor/rules/agent-relay.mdc`。
 
+### 编排模式（用户 2026-06-07）
+
+- **主 Agent 只管主线**：目标、拆 Task、对用户汇报、落盘与 release。
+- **实现与审查全部交给 subagent**（gsd-executor / code-reviewer / explore），主 Agent 只合并摘要，不吞完整 diff。
+- 详见 `AGENTS.md`「编排模式」。
+
 ## 明确不做
 
 - Ruflo federation 主路径
@@ -91,6 +97,6 @@
 - [x] 真机 `~/.agent-relay` 长期跑 relayd
 - [x] `cursor-agent` provider
 - [x] 失败重试 + `relay recover`
-- [ ] setup TUI / 图形化
-- [ ] `type:progress` 可观测
+- [x] setup TUI（编号菜单 + 确认）
+- [x] `type:progress` 可观测（`relay watch`）
 - [x] GitHub `v0.2.0` 发布

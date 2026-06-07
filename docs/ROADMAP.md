@@ -25,8 +25,8 @@
 - [x] 失败自动重试（`relayd.retries.json` + `handleWakeFailure`）
 - [x] `relay recover` — 卡住任务回 pending
 - [x] `relay health` / `relay status --health` 一键诊断（含 `stuckActive`）
-- [ ] setup 图形化或 TUI
-- [ ] `type:progress` 可观测面板
+- [x] setup 图形化或 TUI
+- [x] `type:progress` 可观测（`relay watch` CLI）
 - [x] GitHub 发布 `v0.2.0` tag + Release
 
 ## Phase 3 — 可选扩展
