@@ -92,8 +92,8 @@ bin/relayd.js ──► src/relayd.mjs ──► providers/*.mjs
 - [x] `MEMORY.md` / `WORKLOG` 同步审计与 CodeGraph
 
 **Batch 3（不做除非用户要求）**
-- [ ] 删除 deprecated CLI stub
-- [ ] 合并 relayLog/appendLog
+- [x] 删除 deprecated CLI stub
+- [x] 合并 relayLog/appendLog
 
 ---
 
