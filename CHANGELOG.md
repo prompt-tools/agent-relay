@@ -4,6 +4,29 @@ All notable changes to agent-relay. Format based on [Keep a Changelog](https://k
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-06-07
+
+### Changed
+
+- Provider 4 files merged into `src/providers/index.mjs` (data-driven `PROVIDER_SPECS` registry)
+- `newTaskId` hardened: `toISOString()` + `randomBytes(4)` (32-bit randomness, was 16-bit)
+- `ensureLayout` no longer hardcodes node names — directories auto-created on first write
+- `detectClis`/`isCliReady`/`runCapture` moved from `scripts/` to `src/detect.mjs` (fix reverse dependency)
+- Config files: `nodes.yaml` → `nodes.json`, `project.yaml` → `project.json` (auto-migration on load)
+
+### Added
+
+- Tick error recovery: stuck active tasks auto-recover to pending on tick failure
+- Archive rename failures now logged (was silently swallowed)
+
+### Removed
+
+- Dead exports: `expandHome`, `newTaskId`, `archivePlanOnResult` from src/
+- Dead functions: `launchdPlistPath`, `unloadLaunchd` from scripts/
+- `.plan.json` backward compatibility code from store.mjs
+- `legacyPlan`/`planMarkdown` branch from `sendTask`
+- 12 unused exports from scripts/ (setup, auth, setup-tui)
+
 ## [0.4.0] - 2026-06-07
 
 ### Added
@@ -84,7 +107,8 @@ All notable changes to agent-relay. Format based on [Keep a Changelog](https://k
 - Task files: `{id}.json` (was `{id}.plan.json`)
 - Docs aligned to PRINCIPLES.md / Hermes primary path
 
-[Unreleased]: https://github.com/prompt-tools/agent-relay/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/prompt-tools/agent-relay/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/prompt-tools/agent-relay/releases/tag/v0.5.0
 [0.4.0]: https://github.com/prompt-tools/agent-relay/releases/tag/v0.4.0
 [0.3.0]: https://github.com/prompt-tools/agent-relay/releases/tag/v0.3.0
 [0.2.0]: https://github.com/prompt-tools/agent-relay/releases/tag/v0.2.0
