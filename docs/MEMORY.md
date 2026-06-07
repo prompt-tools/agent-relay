@@ -71,9 +71,12 @@
 
 ### 编排模式（用户 2026-06-07）
 
-- **主 Agent 只管主线**：目标、拆 Task、对用户汇报、落盘与 release。
-- **实现与审查全部交给 subagent**；每个 Task **必须**规格审查 + 质量审查（不可合并）。
-- 完整硬约束 checklist：**`docs/AGENT-CONTRACT.md`**（含会话自检、完成门槛、审查 re-review 规则）。
+- **主 Agent 只管主线**；实现与 **双阶段审查** 派 subagent。
+- **约束不另起炉灶**：绑定 Superpowers / GSD / OMX 已有技能 — 见 **`docs/AGENT-CONTRACT.md`**（含技能路径速查、`spec-reviewer-prompt.md`、`requesting-code-review` 等）。
+
+### 找技能
+
+- 不确定用哪个 → Read **`find-skills`** 或 `npx skills find`。
 
 ## 明确不做
 

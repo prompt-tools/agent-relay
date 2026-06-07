@@ -28,15 +28,18 @@
 
 ## 工作流（摘要 → 细节见 AGENT-CONTRACT.md）
 
-| 阶段 | 做什么 |
-|------|--------|
-| 多步功能 | `writing-plans` → subagent 实现 → **规格审查 + 质量审查**（各一次，不可合并） |
-| 主 Agent | 拆 Task、汇报、MEMORY/WORKLOG/commit；**不写大 diff** |
-| Subagent | 实现（gsd-executor）、审查（code-reviewer）、探索（explore） |
-| 完成前 | `verification-before-completion` + fresh `npm test` |
-| 上下文满 | 落盘 → 以 MEMORY/WORKLOG 为真源 → 必要时 `handoff` |
+**原则：约束绑定已有技能，不另起炉灶。执行前先 Read 对应 SKILL.md。**
 
-完整 checklist、审查协议、自检清单：**`docs/AGENT-CONTRACT.md`**
+| 阶段 | Read 技能 | 派 subagent |
+|------|-----------|-------------|
+| 多步功能 | `writing-plans` | — |
+| 每 Task 执行 | `subagent-driven-development` | `gsd-executor` + **implementer-prompt.md** |
+| 规格审查 | `spec-reviewer-prompt.md` | `generalPurpose` |
+| 质量审查 | `requesting-code-review` | `code-reviewer`（带 BASE/HEAD SHA） |
+| 声称完成 | `verification-before-completion` | fresh `npm test` |
+| 上下文满 | `handoff` + MEMORY/WORKLOG | — |
+
+完整映射（Superpowers / GSD / OMX）：**`docs/AGENT-CONTRACT.md`**
 
 ## 不要
 

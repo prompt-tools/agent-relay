@@ -100,7 +100,13 @@
 
 ---
 
-## 2026-06-07 — Agent 工作契约
+## 2026-06-07 — 约束绑定现有技能体系
+
+**完成**：
+- 重写 `AGENT-CONTRACT.md` — 映射 Superpowers / GSD / OMX / Cursor subagent，附技能路径速查
+- 不再重复造轮子；执行前 MUST Read 对应 SKILL.md
+
+---
 
 **完成**：
 - `docs/AGENT-CONTRACT.md` — 用户要点 → MUST/MUST NOT、双阶段审查、完成门槛、会话自检

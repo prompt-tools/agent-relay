@@ -7,25 +7,20 @@ alwaysApply: true
 
 ## 必读（按序）
 
-`docs/PRINCIPLES.md` → **`docs/AGENT-CONTRACT.md`** → `docs/MEMORY.md` → `docs/WORKLOG.md`
+`docs/PRINCIPLES.md` → **`docs/AGENT-CONTRACT.md`**（约束↔技能绑定）→ `docs/MEMORY.md`
 
-## 协议与主路径
+## 执行前 MUST Read 技能
 
-- 仅 **send** + **receive**（含 claim）；回传 = 再次 send（`type: result|failed|progress`）
-- 默认 E2E：**cursor → hermes**（不用 codex）
+| 场景 | 技能 |
+|------|------|
+| 多 Task | `writing-plans` → `subagent-driven-development` |
+| 每 Task 审查 | `spec-reviewer-prompt.md` → `requesting-code-review` + `code-reviewer` |
+| 说完成 | `verification-before-completion` |
+| 上下文满 | `handoff` |
 
-## 编排（硬约束）
+## 编排
 
-- **主 Agent**：拆 Task、汇报、落盘、commit — **不自己写大 diff**
-- **Subagent**：实现 + **两次独立审查**（规格 PASS/FAIL → code-reviewer + BASE/HEAD SHA）
-- Important/Critical → fix subagent → **re-review** → 整批终审
-- **禁止** 一次 review 糊弄多 Task；**禁止** 无 fresh `npm test` 说完成
-
-## 上下文满（summary / 跨 Phase / 反复扫 transcript）
-
-1. 写 MEMORY + WORKLOG（只增不改贴全文）
-2. 停读 transcript；以 MEMORY/WORKLOG/ROADMAP 为真源
-3. 必要时 `handoff`
+主 Agent 只编排；实现/双审查派 subagent。Red Flags 见 superpowers `subagent-driven-development`。
 
 ## 代码
 
