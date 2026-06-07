@@ -178,6 +178,8 @@
 - `CHANGELOG.md` [Unreleased] → `[0.3.0] - 2026-06-07`（antigravity-cli、relay serve/smoke/gc、e2e-relayd、archivePlanOnResult）
 - 更新 compare 链接（v0.3.0）
 
+**审查**：第三方 code-reviewer **APPROVE WITH NOTES**（`91aca8b..2eda295`）；补 ROADMAP v0.3.0 + CHANGELOG Fixed 后发布 tag
+
 ---
 
 ## 决策日志

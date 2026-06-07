@@ -33,6 +33,9 @@
 
 - [x] antigravity-cli provider
 - [x] `relay serve` 自托管 Web 面板
+- [x] GitHub 发布 `v0.3.0` tag + Release
+
+> `relay watch`、setup TUI 在 ROADMAP Phase 2 规划，实际随 **v0.3.0** 发布（晚于 v0.2.0 tag）。
 
 ## 当前优先级（本机）
 

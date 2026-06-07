@@ -19,6 +19,10 @@ All notable changes to agent-relay. Format based on [Keep a Changelog](https://k
 - setup TUI — numbered menu + y/n confirmation
 - Cross-machine research/design archived under `docs/archive/cross-machine-sync/`
 
+### Fixed
+
+- `relay watch` emit 错误写入 stderr，避免静默失败
+
 ## [0.2.0] - 2026-06-07
 
 ### Added
