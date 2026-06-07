@@ -110,7 +110,18 @@
 
 ---
 
-## 2026-06-07 — Phase 3 Task 2: relay serve
+## 2026-06-07 — 跨机同步：Research-First 流程
+
+**完成**：
+- 调研 `docs/research/2026-06-07-cross-machine-sync.md`（balls/GNAP/rsync/NFS/broker/Syncthing）
+- 设计 `docs/superpowers/specs/2026-06-07-cross-machine-sync-design.md`（推荐 B→A）
+- 实现计划 `docs/superpowers/plans/2026-06-07-phase3-sync-rsync.md`
+- `AGENT-CONTRACT.md` §0.1 Research-First 全链路
+- 调研/设计 Subagent 审查 WARN → 已修订
+
+**下一步**：审计划 → subagent 实现 Task 1–4 → 双审查 → 落地
+
+---
 
 **完成**（subagent + 双审查）：
 - `src/serve.mjs` — `/api/watch`, `/api/health`, 内联 HTML 仪表盘

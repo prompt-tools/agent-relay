@@ -19,6 +19,36 @@
 
 ---
 
+## 0.1 新功能全链路（Research-First，MUST 按序）
+
+**禁止** 跳过调研直接写 plan 或写代码。用户已授权自主推进时，**不必逐步询问**，但 **不可跳过审查 Subagent**。
+
+```
+① 调研 Research     → docs/research/YYYY-MM-DD-<topic>.md
+② 审调研            → generalPurpose（对照 PRINCIPLES/FOCUS/现架构）
+③ 设计 Design       → Read brainstorming → docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md
+④ 审设计            → generalPurpose（方案对比、局限、非目标是否清晰）
+⑤ 实现计划 Plan     → Read writing-plans → docs/superpowers/plans/YYYY-MM-DD-*.md
+⑥ 审计划            → generalPurpose（spec-reviewer-prompt 风格，逐项 PASS/FAIL）
+⑦ 落地 Implement    → subagent-driven-development（每 Task Implementer）
+⑧ 审代码            → 每 Task：Spec + code-reviewer；整批终审
+⑨ 验证落盘          → verification-before-completion + WORKLOG + commit
+```
+
+| 阶段 | Superpowers | Cursor Subagent |
+|------|-------------|-----------------|
+| ① 调研 | `brainstorming`（探索上下文） | `explore` 或 `generalPurpose` 写 research.md |
+| ② 审调研 | — | `generalPurpose` |
+| ③ 设计 | **`brainstorming`** | 主 Agent 汇总或派 `generalPurpose` 写 design.md |
+| ④ 审设计 | — | `generalPurpose` |
+| ⑤ 计划 | **`writing-plans`** | 主 Agent 或 `generalPurpose` |
+| ⑥ 审计划 | — | `generalPurpose`（spec reviewer） |
+| ⑦–⑨ | §1.2 流程 | §1.2 Subagent 表 |
+
+**MUST NOT：** 调研未审就写 design；design 未审就 `writing-plans`；plan 未审就派 Implementer。
+
+---
+
 ## 1. Superpowers 技能映射
 
 ### 1.1 会话与多步功能
@@ -142,7 +172,9 @@
 | 文件 | 用途 |
 |------|------|
 | **`docs/AGENT-CONTRACT.md`** | 本文件 |
-| `AGENTS.md` | 开发指引 |
+| `docs/research/` | 调研结论（先于 design/plan） |
+| `docs/superpowers/specs/` | 设计稿（先于 plan） |
+| `docs/superpowers/plans/` | 实现计划 |
 | `docs/PRINCIPLES.md` | 产品原则 |
 | `docs/MEMORY.md` | 踩坑与决策 |
 | `docs/WORKLOG.md` | 时间线 |
