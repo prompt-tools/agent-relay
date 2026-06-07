@@ -223,6 +223,25 @@
 | 2026-06-07 | 技能驱动：writing-plans + subagent-driven-development | 用户要求规范流程 |
 | 2026-06-07 | CONTRACT S/M/L 档位 | 全仓审计：九步对小改过重 |
 | 2026-06-07 | CodeGraph 本地索引 | MCP 查询；`.codegraph/` 入 gitignore |
+| 2026-06-07 | npm 包名 @prompt-tools/agent-relay | agent-relay 被占 |
+
+---
+
+## 2026-06-07 — P0 分发就绪度
+
+**审计**：sub-agent 审计发现 5/6 FAIL（npm 包名被占、无 files 字段、零跨平台检查、README 内部向、无 CI、版本硬编码）。
+
+**完成**（plan → review → execute → review → fix → re-review）：
+- `@prompt-tools/agent-relay` scoped 包名
+- `package.json` 加 `files`、`author`、`repository`、`homepage`、`bugs`
+- `command -v` → `which`/`where`（setup.mjs）
+- launchd platform guard（setup.mjs + launchd.mjs）
+- README 英文化 + docs/README-zh.md
+- MCP 版本动态读取（readFileSync + JSON.parse）
+- docs/README-zh.md 链接修正
+
+**审查**：两轮 sub-agent review，APPROVE。
+**测试**：62/62
 
 ---
 

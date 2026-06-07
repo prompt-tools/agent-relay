@@ -13,6 +13,7 @@
 7. **v0.3.0 已发布**（2026-06-07）：本机目标达成。
 8. **编排真源** → `docs/AGENT-CONTRACT.md`：**S/M/L 档位** + Hermes **§0.3 必审** + 自主 push（少问用户）。
 9. **CodeGraph**（2026-06-07）：项目根 `codegraph init`；MCP `user-codegraph` 查询；`.codegraph/` **不入 git**。
+10. **npm 包名 `@prompt-tools/agent-relay`**（2026-06-07）：`agent-relay` 被占，scope 用 `@prompt-tools/`。
 
 ## 已验证事实
 
