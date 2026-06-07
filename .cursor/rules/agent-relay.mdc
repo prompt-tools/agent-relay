@@ -1,42 +1,37 @@
 ---
-description: agent-relay 项目原则、范围与开发流程
+description: agent-relay 硬约束 — 协议、编排、审查、上下文
 alwaysApply: true
 ---
 
 # agent-relay
 
-## 必读
+## 必读（按序）
 
-- `docs/PRINCIPLES.md`, `docs/FOCUS.md`, `docs/MEMORY.md`
+`docs/PRINCIPLES.md` → **`docs/AGENT-CONTRACT.md`** → `docs/MEMORY.md` → `docs/WORKLOG.md`
 
-## 协议
+## 协议与主路径
 
-仅 **send** + **receive**（含 claim）。回传 = 再次 send（`type: result|failed|progress`）。无 inbox。
+- 仅 **send** + **receive**（含 claim）；回传 = 再次 send（`type: result|failed|progress`）
+- 默认 E2E：**cursor → hermes**（不用 codex）
 
-## 主路径
+## 编排（硬约束）
 
-**cursor → hermes** E2E。默认不用 codex（用户无额度）。
+- **主 Agent**：拆 Task、汇报、落盘、commit — **不自己写大 diff**
+- **Subagent**：实现 + **两次独立审查**（规格 PASS/FAIL → code-reviewer + BASE/HEAD SHA）
+- Important/Critical → fix subagent → **re-review** → 整批终审
+- **禁止** 一次 review 糊弄多 Task；**禁止** 无 fresh `npm test` 说完成
+
+## 上下文满（summary / 跨 Phase / 反复扫 transcript）
+
+1. 写 MEMORY + WORKLOG（只增不改贴全文）
+2. 停读 transcript；以 MEMORY/WORKLOG/ROADMAP 为真源
+3. 必要时 `handoff`
 
 ## 代码
 
-- Provider: `src/providers/` + 注册 `relayd.mjs`
-- 测试: `npm test` 必须通过再声称完成
-- 多步任务: writing-plans → subagent-driven-development
-
-## 上下文 >75%（或出现 summary / 跨 Phase）
-
-1. 更新 `docs/MEMORY.md` + `docs/WORKLOG.md`（只写新增，引用路径不贴全文）
-2. 有意义改动则 commit
-3. 停止重读 transcript；以 MEMORY/WORKLOG/ROADMAP 为真源
-4. 会话过长 → `handoff` 技能写交接 + 建议技能
-5. 回复精简，大段代码用 citation 不重复粘贴
-
-## 编排（主 Agent 只管主线）
-
-- **主 Agent**：拆 Task、优先级、对用户汇报、MEMORY/WORKLOG/commit
-- **Subagent**：实现（gsd-executor/generalPurpose）、审查（code-reviewer）、探索（explore）
-- 主 Agent 不自己写大 diff、不吞完整 review 输出；只合并 subagent 摘要
+- 零新 npm 依赖；provider → `src/providers/` + `relayd.mjs`
+- 完成前：`npm test` 全绿 + WORKLOG 一行
 
 ## 禁止
 
-Ruflo 联邦、四 IDE 全家桶 setup、恢复 pull/complete、无测试的「做完了」。
+Ruflo 联邦、inbox/pull/complete、四 IDE 全家桶、无测试/无审查的「做完了」

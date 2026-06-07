@@ -2,12 +2,13 @@
 
 给在本仓库工作的 AI Agent 的指引。
 
-## 先读这些
+## 先读这些（顺序）
 
 1. `docs/PRINCIPLES.md` — 不可丢原则
-2. `docs/FOCUS.md` — v1 范围与已否决方向
-3. `docs/MEMORY.md` — 项目经验与踩坑
-4. `docs/WORKLOG.md` — 最近做了什么
+2. **`docs/AGENT-CONTRACT.md`** — **硬约束与审查门槛（必读）**
+3. `docs/FOCUS.md` — v1 范围与已否决方向
+4. `docs/MEMORY.md` — 项目经验与踩坑
+5. `docs/WORKLOG.md` — 最近做了什么
 
 ## 架构一句话
 
@@ -25,66 +26,25 @@
 
 **cursor → hermes**（不是 codex，除非用户明确要求）。
 
-## 技能流程
+## 工作流（摘要 → 细节见 AGENT-CONTRACT.md）
 
-多步任务：
-1. `writing-plans` → `docs/superpowers/plans/`
-2. `subagent-driven-development` 执行
-3. `verification-before-completion` 再声称完成
+| 阶段 | 做什么 |
+|------|--------|
+| 多步功能 | `writing-plans` → subagent 实现 → **规格审查 + 质量审查**（各一次，不可合并） |
+| 主 Agent | 拆 Task、汇报、MEMORY/WORKLOG/commit；**不写大 diff** |
+| Subagent | 实现（gsd-executor）、审查（code-reviewer）、探索（explore） |
+| 完成前 | `verification-before-completion` + fresh `npm test` |
+| 上下文满 | 落盘 → 以 MEMORY/WORKLOG 为真源 → 必要时 `handoff` |
 
-## 上下文预算（>75% 时自动执行）
+完整 checklist、审查协议、自检清单：**`docs/AGENT-CONTRACT.md`**
 
-无法精确读取消耗百分比时，用以下**代理信号**判断「该精简了」：
-
-- 系统注入了 conversation summary（上下文已被压缩过）
-- 同一任务已跨很多轮，且大量 tool 输出仍在记忆里
-- 刚完成一个 Phase / 大 feature，即将开始新主题
-- 重复读取 transcript、全文件或长 diff 才能继续
-
-**精简协议**（按顺序，不要跳步）：
-
-1. **落盘** — 只把*新*决策/踩坑写入 `docs/MEMORY.md`，进展写入 `docs/WORKLOG.md`；不重复已有 plan/ADR 全文，用路径引用
-2. **提交** — 若有未提交的有意义改动，先 commit（用户已授权自主推进时）
-3. **收窄注意力** — 之后优先读 `MEMORY` / `WORKLOG` / `ROADMAP` / 相关 plan，**禁止**再扫完整 transcript 或批量重读已定论文件
-4. **交接** — 若 summary 已发生或会话明显过长：用 `handoff` 技能写一份短交接（存 OS 临时目录），列出「下一步 + 建议技能」
-5. **表达** — 对用户回复保持简短；代码用 `startLine:endLine:path` 引用，不粘贴大段已有内容
-
-**不要**用 `caveman` 做上下文管理（那是沟通风格，不是记忆整理）。
-
-## 编排模式（主 Agent 只管主线）
-
-**主 Agent（编排者）**只负责：
-
-- 读 `MEMORY` / `WORKLOG` / `ROADMAP`，对齐目标与优先级
-- 拆 Task、定验收标准、决定先后
-- 向用户汇报进展与阻塞
-- 落盘 MEMORY/WORKLOG、触发 commit/release
-
-**Subagent 负责**（主 Agent **不**自己写大段实现/不自己跑完整 review diff）：
-
-| 类型 | subagent | 产出 |
-|------|----------|------|
-| 实现 | `gsd-executor` / `generalPurpose` | 代码 + 测试 + 简短摘要 |
-| 审查 | `code-reviewer` / `gsd-code-reviewer` | PASS/WARN + 必修复项 |
-| 探索 | `explore` | 文件路径 + 结论，不贴全文 |
-
-流程：**拆 Task → 派 subagent 实现 → 两阶段审查 → 主 Agent 合并结论 → npm test 证据 → 落盘**。
-
-### 审查协议（Mandatory，不可跳过）
-
-每个 Task 完成后，主 Agent **必须**依次派 subagent（不可合并成一次敷衍 review）：
-
-1. **规格审查**（`generalPurpose` / spec reviewer）— 对照 Task checklist 逐项 PASS/FAIL
-2. **质量审查**（`code-reviewer`）— 按 `requesting-code-review` 提供 `BASE_SHA`/`HEAD_SHA` 与需求摘要
-3. **修复** — Important/Critical 派 `gsd-code-fixer`；修复后再派 quality reviewer **re-review**
-4. **整批收尾** — 全部 Task 完成后，再派一次 `code-reviewer` 覆盖整个 commit range
-
-主 Agent 回复用户时只带结论与 citation，不带 subagent 的完整 tool 输出。
+## 不要
 
 - 恢复 inbox/pull/complete
 - 引入 Ruflo 联邦为主路径
 - 扩 scope 到四 provider 齐测 / Docker / 跨机
-- 跳过测试或 memory/worklog 更新
+- 跳过测试、跳过双阶段审查、或 memory/worklog 更新
+- 一次 code-review 糊弄多个 Task
 
 ## 常用命令
 
@@ -93,4 +53,5 @@ npm test
 node bin/relay.js setup --role receiver --node hermes --yes
 node bin/relay.js send hermes --from cursor --project . --title T --plan-text "## ..."
 node bin/relay.js receive cursor --type result
+node bin/relay.js watch --once
 ```

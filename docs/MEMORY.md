@@ -72,8 +72,8 @@
 ### 编排模式（用户 2026-06-07）
 
 - **主 Agent 只管主线**：目标、拆 Task、对用户汇报、落盘与 release。
-- **实现与审查全部交给 subagent**（gsd-executor / code-reviewer / explore），主 Agent 只合并摘要，不吞完整 diff。
-- 详见 `AGENTS.md`「编排模式」。
+- **实现与审查全部交给 subagent**；每个 Task **必须**规格审查 + 质量审查（不可合并）。
+- 完整硬约束 checklist：**`docs/AGENT-CONTRACT.md`**（含会话自检、完成门槛、审查 re-review 规则）。
 
 ## 明确不做
 
@@ -86,6 +86,7 @@
 
 | 用途 | 文件 |
 |------|------|
+| **Agent 硬约束** | **`docs/AGENT-CONTRACT.md`** |
 | 原则 | `docs/PRINCIPLES.md` |
 | 范围 | `docs/FOCUS.md` |
 | 操作 | `docs/SETUP.md`, `docs/E2E.md` |

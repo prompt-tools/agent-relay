@@ -96,7 +96,15 @@
 - 编排模式写入 `AGENTS.md` / Cursor rules
 - 审查 LOW 修复：watch SIGTERM、active 字段 fallback
 
-**测试**：43/43 pass
+**测试**：45/45 pass（含 watch emit try/catch）
+
+---
+
+## 2026-06-07 — Agent 工作契约
+
+**完成**：
+- `docs/AGENT-CONTRACT.md` — 用户要点 → MUST/MUST NOT、双阶段审查、完成门槛、会话自检
+- 精简 `AGENTS.md` + 强化 `.cursor/rules/agent-relay.mdc`
 
 ---
 
