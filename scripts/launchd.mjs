@@ -9,6 +9,9 @@ export function launchdPlistPath(dir) {
 }
 
 export function loadLaunchd(plistPath) {
+  if (process.platform !== 'darwin') {
+    throw new Error('launchd is macOS-only. On Linux, run relayd manually or use systemd.');
+  }
   const uid = process.getuid?.() ?? Number(execSync('id -u', { encoding: 'utf8' }).trim());
   const domain = `gui/${uid}`;
   try {

@@ -23,7 +23,8 @@ export const CLI_CANDIDATES = {
 
 export function resolveBinaryPath(binary) {
   try {
-    return execSync(`command -v ${binary}`, { encoding: 'utf8' }).trim();
+    const cmd = process.platform === 'win32' ? 'where' : 'which';
+    return execSync(`${cmd} ${binary}`, { encoding: 'utf8' }).trim();
   } catch {
     return binary;
   }
@@ -31,7 +32,8 @@ export function resolveBinaryPath(binary) {
 
 export function commandExists(binary) {
   try {
-    execSync(`command -v ${binary}`, { stdio: 'ignore' });
+    const cmd = process.platform === 'win32' ? 'where' : 'which';
+    execSync(`${cmd} ${binary}`, { stdio: 'ignore' });
     return true;
   } catch {
     return false;
@@ -193,7 +195,7 @@ export async function runSetup(options = {}) {
       steps.push({ step: 'mcp', path: mcpPath, note: 'Restart Cursor to load MCP' });
     }
 
-    if (installLaunchd) {
+    if (installLaunchd && process.platform === 'darwin') {
       const plist = writeLaunchdPlist(home, relaydPath, { launchAgentsDir });
       steps.push({ step: 'launchd-write', path: plist });
       if (shouldLoad) {
@@ -204,6 +206,8 @@ export async function runSetup(options = {}) {
           steps.push({ step: 'launchd-load', ok: false, error: err.message });
         }
       }
+    } else if (installLaunchd && process.platform !== 'darwin') {
+      steps.push({ step: 'launchd-skip', reason: 'Not macOS — run relayd manually or configure a system service' });
     }
   } else {
     steps.push({ step: 'dry-run', role, nodeId, detected: detected.map((d) => d.key) });

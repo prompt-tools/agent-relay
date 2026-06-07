@@ -1,9 +1,14 @@
 #!/usr/bin/env node
 import readline from 'node:readline';
+import { readFileSync } from 'node:fs';
+import { resolve, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { loadConfig } from '../src/config.mjs';
 import { sendTask, receiveTasks, claimTask } from '../src/store.mjs';
 
-const SERVER_INFO = { name: 'agent-relay', version: '0.3.0' };
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const { version } = JSON.parse(readFileSync(resolve(__dirname, '..', 'package.json'), 'utf8'));
+const SERVER_INFO = { name: 'agent-relay', version };
 
 const TOOLS = [
   {

@@ -1,5 +1,5 @@
 {
-  "name": "agent-relay",
+  "name": "@prompt-tools/agent-relay",
   "version": "0.3.0",
   "description": "Lightweight cross-IDE agent task relay — plan in Cursor, execute in Hermes, artifacts back.",
   "type": "module",
@@ -16,6 +16,19 @@
     "node": ">=20"
   },
   "license": "MIT",
+  "author": "Klaus Cao <mxnfsf@gmail.com>",
+  "repository": "github:prompt-tools/agent-relay",
+  "homepage": "https://github.com/prompt-tools/agent-relay#readme",
+  "bugs": "https://github.com/prompt-tools/agent-relay/issues",
+  "files": [
+    "bin/",
+    "src/",
+    "mcp/",
+    "scripts/",
+    "LICENSE",
+    "README.md",
+    "CHANGELOG.md"
+  ],
   "keywords": [
     "agent",
     "cursor",
