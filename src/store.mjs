@@ -38,7 +38,7 @@ function taskFileName(id) {
 }
 
 /** Generate a timestamp-based task ID (YYYYMMDD-HHMMSS-xxxx). */
-export function newTaskId() {
+function newTaskId() {
   const d = new Date();
   const pad = (n) => String(n).padStart(2, '0');
   const stamp = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
@@ -56,8 +56,6 @@ export function newTaskId() {
  * @param {string} [input.title] - Task title
  * @param {object} [input.body={}] - Task body payload
  * @param {string} [input.taskId] - Related task id (for results)
- * @param {string[]} [input.acceptance=[]] - Acceptance criteria
- * @param {object} [input.refs={}] - Reference links
  * @returns {object} The validated task envelope
  */
 export function sendTask(config, input) {
@@ -69,12 +67,7 @@ export function sendTask(config, input) {
     title,
     body = {},
     taskId,
-    acceptance = [],
-    refs = {},
   } = input;
-
-  const planMarkdown = input.planMarkdown ?? body.markdown;
-  const legacyPlan = planMarkdown !== undefined;
 
   assertNode(config, to);
   assertNode(config, from);
@@ -94,9 +87,7 @@ export function sendTask(config, input) {
     status: 'pending',
     createdAt: new Date().toISOString(),
     title: title || 'Untitled task',
-    body: legacyPlan
-      ? { markdown: planMarkdown, acceptance, refs, ...body }
-      : body,
+    body,
     ...(taskId ? { taskId } : {}),
     replyTo: from,
   });
@@ -110,7 +101,7 @@ export function sendTask(config, input) {
 }
 
 /** Move executor's claimed plan active → done when result arrives (internal; not a CLI primitive). */
-export function archivePlanOnResult(config, executorNode, taskId) {
+function archivePlanOnResult(config, executorNode, taskId) {
   assertNode(config, executorNode);
   const p = layout(config.home);
   const src = join(p.active(executorNode), taskFileName(taskId));
@@ -136,14 +127,14 @@ function readJson(path) {
 
 function listTaskFiles(dir) {
   if (!existsSync(dir)) return [];
-  return readdirSync(dir).filter((f) => f.endsWith('.json') || f.endsWith('.plan.json'));
+  return readdirSync(dir).filter((f) => f.endsWith('.json'));
 }
 
 function findTaskFile(config, id) {
   const p = layout(config.home);
   for (const node of config.nodes) {
     for (const bucket of ['pending', 'active', 'done', 'failed']) {
-      for (const name of [taskFileName(id), `${id}.plan.json`]) {
+      for (const name of [taskFileName(id)]) {
         const f = join(p.tasks, bucket, node, name);
         if (existsSync(f)) return { bucket, node, path: f };
       }
@@ -196,13 +187,11 @@ export function claimTask(config, node, id) {
   let src;
   if (id) {
     src = join(p.pending(node), taskFileName(id));
-    if (!existsSync(src)) src = join(p.pending(node), `${id}.plan.json`);
   } else {
     const pending = listTasks(config, node, 'pending');
     if (!pending.length) throw new Error(`No pending tasks for ${node}`);
     id = pending[0].id;
     src = join(p.pending(node), taskFileName(id));
-    if (!existsSync(src)) src = join(p.pending(node), `${id}.plan.json`);
   }
   const dst = join(p.active(node), taskFileName(id));
   if (!existsSync(src)) throw new Error(`Task not pending: ${id}`);

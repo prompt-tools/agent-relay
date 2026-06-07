@@ -7,7 +7,7 @@ import { mkdirSync, existsSync } from 'node:fs';
  * @param {string} p - Path that may start with ~
  * @returns {string} Absolute path
  */
-export function expandHome(p) {
+function expandHome(p) {
   if (!p || p === '~') return homedir();
   if (p.startsWith('~/')) return join(homedir(), p.slice(2));
   return p;
