@@ -14,7 +14,7 @@ import { loadLaunchd } from './launchd.mjs';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, '..');
 
-export function buildMcpEntry(relayMcpPath) {
+function buildMcpEntry(relayMcpPath) {
   return {
     'agent-relay': {
       command: process.execPath,
@@ -24,7 +24,7 @@ export function buildMcpEntry(relayMcpPath) {
   };
 }
 
-export function mergeMcpConfig(configPath, relayMcpPath) {
+function mergeMcpConfig(configPath, relayMcpPath) {
   const entry = buildMcpEntry(relayMcpPath);
   mkdirSync(dirname(configPath), { recursive: true });
   let config = { mcpServers: {} };
@@ -37,7 +37,7 @@ export function mergeMcpConfig(configPath, relayMcpPath) {
   return configPath;
 }
 
-export function buildLaunchdPlist({ home, relaydPath, nodeEnv = {} }) {
+function buildLaunchdPlist({ home, relaydPath, nodeEnv = {} }) {
   const pathEnv = [process.env.PATH, `${homedir()}/.local/bin`, '/opt/homebrew/bin', '/usr/local/bin']
     .filter(Boolean)
     .join(':');
@@ -76,7 +76,7 @@ ${envXml}
 `;
 }
 
-export function writeLaunchdPlist(home, relaydPath, { launchAgentsDir } = {}) {
+function writeLaunchdPlist(home, relaydPath, { launchAgentsDir } = {}) {
   const dir = launchAgentsDir || join(homedir(), 'Library', 'LaunchAgents');
   mkdirSync(dir, { recursive: true });
   const plistPath = join(dir, 'com.agent-relay.relayd.plist');
@@ -84,7 +84,7 @@ export function writeLaunchdPlist(home, relaydPath, { launchAgentsDir } = {}) {
   return plistPath;
 }
 
-export function configureNodes(home, { role, nodeId, detected }) {
+function configureNodes(home, { role, nodeId, detected }) {
   const results = [];
   if (role === 'sender' || role === 'both') {
     setNode(home, nodeId, { provider: 'manual' });
@@ -100,7 +100,7 @@ export function configureNodes(home, { role, nodeId, detected }) {
   return results;
 }
 
-export async function promptInteractive({ role, nodeId, detected }) {
+async function promptInteractive({ role, nodeId, detected }) {
   if (!input.isTTY) return { role, nodeId };
   const result = await runSetupTui({
     role,

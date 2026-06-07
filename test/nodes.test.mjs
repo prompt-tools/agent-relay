@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { loadNodes, saveNodes, getProvider, setNode } from '../src/nodes.mjs';
 
-test('nodes.yaml roundtrip', () => {
+test('nodes.json roundtrip', () => {
   const home = mkdtempSync(join(tmpdir(), 'agent-relay-nodes-'));
   try {
     assert.equal(getProvider(home, 'codex'), 'manual');

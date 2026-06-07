@@ -32,7 +32,7 @@ export function layout(home) {
   return {
     home: h,
     config: join(h, 'config.json'),
-    nodes: join(h, 'nodes.yaml'),
+    nodes: join(h, 'nodes.json'),
     relaydPid: join(h, 'relayd.pid'),
     relaydProcessed: join(h, 'relayd.processed.json'),
     relaydRetries: join(h, 'relayd.retries.json'),

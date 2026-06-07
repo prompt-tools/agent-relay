@@ -10,7 +10,7 @@ test('loadProjectRouting reads defaultTo', () => {
   try {
     const cfg = join(dir, '.agent-relay');
     mkdirSync(cfg, { recursive: true });
-    writeFileSync(join(cfg, 'project.yaml'), JSON.stringify({ defaultTo: 'hermes' }) + '\n');
+    writeFileSync(join(cfg, 'project.json'), JSON.stringify({ defaultTo: 'hermes' }) + '\n');
     const r = loadProjectRouting(dir);
     assert.equal(r.defaultTo, 'hermes');
     assert.equal(resolveSendTarget({ projectPath: dir }), 'hermes');

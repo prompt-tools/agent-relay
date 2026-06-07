@@ -1,7 +1,7 @@
 import { spawnSync } from 'node:child_process';
 import { isCliReady, AUTH_COMMANDS } from '../src/detect.mjs';
 
-export function runLogin(key, { interactive = true } = {}) {
+function runLogin(key, { interactive = true } = {}) {
   const spec = AUTH_COMMANDS[key];
   if (!spec?.login) {
     return { ok: true, skipped: true, note: spec?.note };

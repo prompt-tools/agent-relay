@@ -13,14 +13,14 @@ const ROLE_NUM = {
   both: 3,
 };
 
-export function parseRoleChoice(raw, fallback = 'both') {
+function parseRoleChoice(raw, fallback = 'both') {
   const v = (raw ?? '').trim();
   if (!v) return fallback;
   const n = Number(v);
   return ROLE_BY_NUM[n] ?? fallback;
 }
 
-export function parseNodeFromMenu(raw, detected, fallback) {
+function parseNodeFromMenu(raw, detected, fallback) {
   const v = (raw ?? '').trim();
   if (!detected.length) {
     return v || fallback;
@@ -36,7 +36,7 @@ export function parseNodeFromMenu(raw, detected, fallback) {
   return fallback;
 }
 
-export function parseConfirm(raw) {
+function parseConfirm(raw) {
   const v = (raw ?? '').trim().toLowerCase();
   return v === 'y' || v === 'yes';
 }

@@ -1,10 +1,15 @@
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, renameSync } from 'node:fs';
 import { layout } from './paths.mjs';
 
 export function loadNodes(home) {
-  const p = layout(home).nodes;
-  if (!existsSync(p)) return { nodes: {} };
-  return JSON.parse(readFileSync(p, 'utf8'));
+  const paths = layout(home);
+  const yamlPath = paths.nodes.replace('.json', '.yaml');
+  // 迁移: .yaml → .json
+  if (!existsSync(paths.nodes) && existsSync(yamlPath)) {
+    renameSync(yamlPath, paths.nodes);
+  }
+  if (!existsSync(paths.nodes)) return { nodes: {} };
+  return JSON.parse(readFileSync(paths.nodes, 'utf8'));
 }
 
 export function saveNodes(home, data) {
