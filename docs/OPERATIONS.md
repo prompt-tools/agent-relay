@@ -77,8 +77,9 @@ relay smoke --project .
 # 检查进程
 ps aux | grep relayd
 
-# 手动启动
-node src/relayd.mjs
+# 手动启动（调试）
+relayd
+# 或 node bin/relayd.js
 
 # 看 stderr 日志
 cat ~/.agent-relay/relayd.stderr.log
