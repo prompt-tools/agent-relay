@@ -1,14 +1,17 @@
 # agent-relay
 
-本机 Agent 任务邮政局：**发 → 自动唤醒执行方 → 再发回来**。
+本机 Agent 任务邮政局：**Cursor 发 plan → relayd 唤醒 Hermes → 做完 send 回传**。
 
-## 典型流程
+当前版本：**v0.3.0** · [Release notes](https://github.com/prompt-tools/agent-relay/releases/tag/v0.3.0)
+
+## 典型流程（主路径 cursor → hermes）
 
 ```
-Cursor  relay send codex     →  pending/codex/
-relayd  claim + spawn codex  →  codex exec ...
-codex   relay send cursor    →  pending/cursor/ (type=result)
-Cursor  relay receive cursor →  读取结果
+Cursor  relay send hermes     →  pending/hermes/
+relayd  claim + hermes chat   →  active/hermes/
+hermes  relay send cursor     →  pending/cursor/ (type=result)
+        plan 归档              →  done/hermes/
+Cursor  relay receive cursor  →  读取结果
 ```
 
 ## 快速开始
@@ -17,59 +20,50 @@ Cursor  relay receive cursor →  读取结果
 cd ~/Projects/agent-relay
 npm test
 
-# 一次性配置
-node bin/relay.js setup --role both --node cursor
-# 或分拆：发送方 --role sender，接收方 --role receiver --node codex
+# 接收方（Hermes + relayd）
+relay setup --role receiver --node hermes --yes
 
-# 发送任务
-node bin/relay.js send codex --from cursor --project ~/Projects/foo \
-  --title "示例" --plan-text "## 步骤\n1. ..."
+# 发送方（Cursor MCP）
+relay setup --role sender --node cursor --yes
+# 重启 Cursor
 
-# 收取回传
-node bin/relay.js receive cursor --type result
+# 发任务（本仓库已配 .agent-relay/project.yaml → defaultTo hermes）
+relay send --project . --title "任务" --plan-text "## 步骤\n..."
+
+# 验收
+relay health
+relay smoke --project .          # live 全链路，约 10–30s
+relay receive cursor --type result
 ```
+
+## 常用命令
+
+| 命令 | 作用 |
+|------|------|
+| `relay watch --once` | 队列 / active / 日志快照 |
+| `relay serve` | 本机面板 http://127.0.0.1:3847 |
+| `relay gc --yes` | 清理 processed 孤儿 pending |
+| `relay recover hermes` | 卡住任务回 pending |
 
 ## MCP（Cursor）
 
-`relay setup` 会合并 `~/.cursor/mcp.json`。也可手动添加：
-
-```json
-{
-  "mcpServers": {
-    "agent-relay": {
-      "command": "node",
-      "args": ["/path/to/agent-relay/mcp/server.mjs"]
-    }
-  }
-}
-```
-
-工具：`relay_send`、`relay_receive`
+`relay setup` 合并 `~/.cursor/mcp.json`。工具：`relay_send`、`relay_receive`
 
 ## 文档
 
 | 文件 | 内容 |
 |------|------|
-| [AGENTS.md](AGENTS.md) | AI Agent 工作指引 |
-| [docs/PRINCIPLES.md](docs/PRINCIPLES.md) | 不可丢原则 |
-| [docs/MEMORY.md](docs/MEMORY.md) | 项目记忆与踩坑 |
-| [docs/WORKLOG.md](docs/WORKLOG.md) | 开发工作记录 |
-| [docs/FOCUS.md](docs/FOCUS.md) | v1 范围 |
+| [docs/AGENT-CONTRACT.md](docs/AGENT-CONTRACT.md) | Agent 工作契约（含 Hermes 派活 + 第三方审查） |
+| [docs/E2E.md](docs/E2E.md) | E2E 与 smoke |
 | [docs/SETUP.md](docs/SETUP.md) | 安装与 OAuth |
-| [docs/E2E.md](docs/E2E.md) | E2E 流程（cursor→hermes） |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | 组件与数据流 |
+| [docs/PRINCIPLES.md](docs/PRINCIPLES.md) | 原则 |
+| [docs/MEMORY.md](docs/MEMORY.md) | 踩坑与决策 |
 | [CHANGELOG.md](CHANGELOG.md) | 版本变更 |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | 贡献指南 |
-
-## 可靠性
-
-- 原子写盘 + rename claim
-- relayd 单实例 + 去重
-- 详见 [docs/RELIABILITY.md](docs/RELIABILITY.md)
 
 ## 状态
 
-**v1**：协议、relayd、setup、MCP 已实现；E2E 需本机 codex CLI 实测。
+- **v0.3.0**：本机 E2E 已验收（CI `e2e-relayd` + live `relay smoke` PROD3 OK）
+- **跨机同步**：封存，见 `docs/archive/cross-machine-sync/`
 
 ## License
 

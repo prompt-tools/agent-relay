@@ -42,8 +42,11 @@
 - [x] **本机 E2E CI 闭环** — `test/e2e-relayd.test.mjs` + `npm test` 62/62
 - [x] **本机 live smoke 可重复** — `relay smoke`；实测 **PROD3 OK** ~12s（2026-06-07）
 - [x] `relay health` 无 orphan
+- [x] **GitHub 发布 `v0.3.0` tag + Release**
 
-单机 Phase 3 功能已齐；**验收本机闭环** 后再做其它。
+**本机目标已达成。** 后续：Research-First 新功能 · 派 Hermes + 第三方审查 · 跨机封存。
+
+单机 Phase 3 功能已齐。
 
 ## 封存 — 最后做
 

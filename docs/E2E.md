@@ -64,14 +64,14 @@ relay receive cursor --type result
 | Hermes 未回传 | Hermes 是否配好 API key：`hermes status` |
 | MCP 不工作 | 重启 Cursor；检查 `~/.cursor/mcp.json` |
 
-## 成功标准 Checklist
+## 成功标准 Checklist（已通过 2026-06-07）
 
-- [ ] `relay send` → `pending/hermes/<id>.json`
-- [ ] `relayd` 运行（launchd 或手动 `relayd`）
-- [ ] plan → `active/hermes/`
-- [ ] Hermes spawn 含 `relay send cursor --type result`
-- [ ] 回传在 `pending/cursor/`，`type=result`；plan 归档到 `done/hermes/`
-- [ ] `npm test` 全绿（含 `test/e2e-relayd.test.mjs` 闭环）
+- [x] `relay send` → `pending/hermes/<id>.json`
+- [x] `relayd` 运行（launchd 或手动 `relayd`）
+- [x] plan → `active/hermes/`
+- [x] Hermes spawn 含 `relay send cursor --type result`
+- [x] 回传在 `pending/cursor/`，`type=result`；plan 归档到 `done/hermes/`
+- [x] `npm test` 全绿（含 `test/e2e-relayd.test.mjs` 闭环）
 
 ## 自动化验收
 

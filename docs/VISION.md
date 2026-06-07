@@ -11,17 +11,13 @@
 3. 发送方只认逻辑节点名；接收方自选 wake provider
 4. CLI + MCP + relayd 同构，读同一份 `~/.agent-relay`
 
-## 非目标（v1）
+## 非目标（v1 原范围）
 
 - Ruflo 联邦 / Hub / peer mesh
 - inbox / pull / complete 不对称链路
-- Docker 门面、跨机同步
-- 四 provider 齐测、Web 面板
+- Docker 门面、**跨机同步**（封存）
+- 四 provider 齐测
 
-## 成功标准
+## 现状（v0.3.0）
 
-见 [E2E.md](E2E.md) checklist：一条 `relay_send` → 结果出现在 `pending/cursor/` 的 `type:result` 任务。
-
-## 产品路径
-
-`relay setup` → `relayd` → `relay send/receive` → 后加 TUI/Web 面板
+本机 **cursor → hermes → cursor** 已实测；`relay serve` / `relay smoke` / `relay gc` 已交付。跨机见 archive。

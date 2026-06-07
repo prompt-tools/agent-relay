@@ -16,6 +16,7 @@
 | 新会话 | `using-superpowers` | — |
 | 多 Task | `writing-plans` → `subagent-driven-development` | Implementer |
 | 每 Task | `spec-reviewer-prompt.md` → `requesting-code-review` | `generalPurpose` → `code-reviewer` |
+| **Hermes 回传** | — | **`code-reviewer` 必审** → 自主 push/release（见 CONTRACT §0.2） |
 | 修 review | `receiving-code-review` | `gsd-code-fixer` |
 | 完成 | `verification-before-completion` | 主 Agent 跑 `npm test` |
 | 收尾 | `finishing-a-development-branch` | — |

@@ -6,8 +6,12 @@
 
 ## 当前优先级（2026-06-07）
 
-1. **本机可用** — `docs/E2E.md` 可重复通过；`relay health` 绿；MCP + relayd 长期稳定  
-2. **跨机同步** — **封存**，文档在 `docs/archive/cross-machine-sync/`，本机验收后再做
+**本机目标已达成**（v0.3.0 已发布）。日常：
+
+1. `relay health` 绿 · `npm test` 绿 · 需要时 `relay smoke`
+2. 新功能走 **Research-First**（`docs/AGENT-CONTRACT.md` §0.1）
+3. 派 Hermes 干活 → **code-reviewer 必审** → 自主 merge/release（§0.2）
+4. **跨机同步** — **封存** → `docs/archive/cross-machine-sync/`
 
 ## 已否决方向（勿再讨论/实现）
 
@@ -31,9 +35,10 @@
 6. **先打通一条线**：**cursor → hermes**（已实测 E2E）
 7. **文档**：PRINCIPLES.md 为准；VISION.md 待对齐（唤醒改为核心）
 
-## v1 不做
+## v1 不做（仍有效）
 
-- 四 provider 齐发、Antigravity 必测、跨机、Web 面板、A2A/ACP 原生实现
+- 四 provider 齐发、Antigravity 必测、**跨机**、A2A/ACP 原生实现  
+- ~~Web 面板~~ → v0.3 已有 `relay serve`（本机只读）
 
 ## 唤醒命令（provider 参考，实现时再用）
 

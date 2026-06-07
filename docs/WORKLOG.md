@@ -182,6 +182,14 @@
 
 ---
 
+## 2026-06-07 — v0.3.0 发布 + 文档对齐
+
+- GitHub Release [v0.3.0](https://github.com/prompt-tools/agent-relay/releases/tag/v0.3.0)
+- AGENT-CONTRACT §0.2：Hermes 派活 + 第三方审查 + **无需用户逐步确认**
+- README / FOCUS / VISION / E2E checklist 与现状对齐
+
+---
+
 ## 决策日志
 
 | 日期 | 决策 | 原因 |

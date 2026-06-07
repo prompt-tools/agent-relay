@@ -10,6 +10,7 @@
 4. **按角色 setup**（sender/receiver/both），不要四 IDE 全家桶。
 5. **v1 = CLI + relayd + MCP**，不做 Docker / 联邦。
 6. **跨机同步封存**（2026-06-07）：调研/设计/计划保留在 `docs/archive/cross-machine-sync/`；**本机 E2E 稳定前不写 `relay sync` 代码**。
+7. **v0.3.0 已发布**（2026-06-07）：本机目标达成；Hermes 可派活，**回传必须经 code-reviewer**，主 Agent **无需用户确认**即可 push/tag（见 AGENT-CONTRACT §0.2）。
 
 ## 已验证事实
 

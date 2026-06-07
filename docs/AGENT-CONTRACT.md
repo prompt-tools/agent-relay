@@ -49,6 +49,30 @@
 
 ---
 
+## 0.2 派给 Hermes / 外部执行方（MUST）
+
+目标已明确时，**主 Agent 自主推进**，不必向用户逐步确认。仅当破坏性操作或范围不明时才问用户。
+
+```
+① 主 Agent relay send hermes（plan 含约束、验收、是否允许 commit/push）
+② relayd 唤醒 Hermes 执行
+③ Hermes relay send cursor（type=result）
+④ 主 Agent 派 code-reviewer 审 Hermes 产出（BASE..HEAD 或指定 commit）— **不可跳过**
+⑤ 按 review 修正（主 Agent 或 Fixer Subagent）
+⑥ verification-before-completion：`npm test` fresh pass
+⑦ 该合并的合并、该 push/tag/release 的按 ROADMAP 执行 — **无需再问用户**
+⑧ WORKLOG 一行
+```
+
+| 步骤 | Subagent |
+|------|----------|
+| ④ 审 Hermes | **`code-reviewer`**（第三方，非 Hermes 自审） |
+| ⑤ 修 Critical/Important | Implementer / `gsd-code-fixer` |
+
+**MUST NOT：** Hermes result 未审就 merge/push；把「要不要发布」甩给用户（ROADMAP 已列发布项则直接做）。
+
+---
+
 ## 1. Superpowers 技能映射
 
 ### 1.1 会话与多步功能
