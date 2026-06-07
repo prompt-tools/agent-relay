@@ -70,5 +70,12 @@ relay receive cursor --type result
 - [ ] `relayd` 运行（launchd 或手动 `relayd`）
 - [ ] plan → `active/hermes/`
 - [ ] Hermes spawn 含 `relay send cursor --type result`
-- [ ] 回传在 `pending/cursor/`，`type=result`
-- [ ] `npm test` 全绿
+- [ ] 回传在 `pending/cursor/`，`type=result`；plan 归档到 `done/hermes/`
+- [ ] `npm test` 全绿（含 `test/e2e-relayd.test.mjs` 闭环）
+
+## 自动化验收
+
+```bash
+npm test   # 含 relayd fake-spawn 全链路；当前 60/60
+relay health   # 看 orphanPendingPlans；非空则 relay gc --yes
+```

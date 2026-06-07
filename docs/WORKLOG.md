@@ -119,7 +119,21 @@
 - `AGENT-CONTRACT.md` §0.1 Research-First 全链路
 - 调研/设计 Subagent 审查 WARN → 已修订
 
-**下一步**：审计划 → subagent 实现 Task 1–4 → 双审查 → 落地
+**决定**：跨机 **封存**，本机 E2E 验收优先 → `docs/archive/cross-machine-sync/README.md`
+
+---
+
+## 2026-06-07 — 本机 E2E 验收（Research-First）
+
+**链路**：调研 → 审 → 设计 → 审 → 计划 → 实现 → `npm test` **60/60**
+
+**完成**：
+- `archivePlanOnResult`（result → plan 进 `done/`）
+- `relay gc` + health `orphanPendingPlans`
+- `test/e2e-relayd.test.mjs` relayd 闭环
+- 文档：E2E / RELIABILITY v2 对齐 / ROADMAP
+
+**生产**：`relay gc --yes` 清理历史 orphan pending
 
 ---
 

@@ -93,6 +93,30 @@ export function sendTask(config, input) {
 
   atomicWriteJson(file, task);
   appendLog(config.home, { op: 'send', id, type, from, to });
+  if (type === 'result' && taskId) {
+    archivePlanOnResult(config, from, taskId);
+  }
+  return task;
+}
+
+/** Move executor's claimed plan active → done when result arrives (internal; not a CLI primitive). */
+export function archivePlanOnResult(config, executorNode, taskId) {
+  assertNode(config, executorNode);
+  const p = layout(config.home);
+  const src = join(p.active(executorNode), taskFileName(taskId));
+  if (!existsSync(src)) return null;
+  const dst = join(p.done(executorNode), taskFileName(taskId));
+  if (!existsSync(join(p.done(executorNode), '..'))) ensureLayout(config.home);
+  try {
+    renameSync(src, dst);
+  } catch {
+    return null;
+  }
+  const task = readJson(dst);
+  task.status = 'done';
+  task.completedAt = new Date().toISOString();
+  atomicWriteJson(dst, task);
+  appendLog(config.home, { op: 'archive', id: taskId, node: executorNode });
   return task;
 }
 

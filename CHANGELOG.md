@@ -6,12 +6,11 @@ All notable changes to agent-relay. Format based on [Keep a Changelog](https://k
 
 ### Added
 
-- `antigravity-cli` provider (`agy -p` + `--dangerously-skip-permissions`)
-- `relay serve` — local HTTP dashboard (`127.0.0.1:3847`, `/api/watch`, `/api/health`)
-- `relay watch` — terminal observability for active tasks, progress, and relay.log ops
-- Interactive setup TUI (`scripts/setup-tui.mjs`) — numbered role/node menu with confirm
-- Orchestrator mode in `AGENTS.md` — main agent coordinates, subagents implement/review
-- `docs/AGENT-CONTRACT.md` — mandatory review gates, context budget, session self-check
+- `archivePlanOnResult` — result send archives plan to `done/` (internal, no `complete` CLI)
+- `relay gc` — remove orphan pending plans already in `relayd.processed`
+- `health` check `orphanPendingPlans`
+- `test/e2e-relayd.test.mjs` — CI-provable cursor→hermes→cursor loop
+- Cross-machine research/design archived under `docs/archive/cross-machine-sync/`
 
 ## [0.2.0] - 2026-06-07
 

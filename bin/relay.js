@@ -33,6 +33,7 @@ Usage:
   relay watch [--interval <sec>] [--once] [--json]
   relay serve [--host <addr>] [--port <n>]
   relay recover <node> [--task-id <id>] [--older-than <sec>]
+  relay gc [--dry-run] [--yes]
   relay setup [--role sender|receiver|both] [--node <nodeId>] [--dry-run] [--skip-auth]
 
 Deprecated (use send/receive instead):
@@ -190,6 +191,38 @@ async function run() {
 
   if (cmd === 'health') {
     console.log(JSON.stringify(healthReport(config.home), null, 2));
+    return;
+  }
+
+  if (cmd === 'gc') {
+    const { gcOrphanPendingPlans } = await import('../src/gc.mjs');
+    const dryRun = args.includes('--dry-run');
+    if (dryRun) {
+      console.log(JSON.stringify({ ok: true, ...gcOrphanPendingPlans(config, { dryRun: true }) }, null, 2));
+      return;
+    }
+    const preview = gcOrphanPendingPlans(config, { dryRun: true });
+    if (!preview.orphans.length) {
+      console.log(JSON.stringify({ ok: true, message: 'no orphan pending plans', removed: [] }, null, 2));
+      return;
+    }
+    if (!args.includes('--yes')) {
+      console.error(
+        JSON.stringify(
+          {
+            ok: false,
+            error: `${preview.orphans.length} orphan pending plan(s); re-run with --yes to delete`,
+            orphans: preview.orphans,
+          },
+          null,
+          2,
+        ),
+      );
+      process.exitCode = 1;
+      return;
+    }
+    const result = gcOrphanPendingPlans(config, { dryRun: false });
+    console.log(JSON.stringify({ ok: true, ...result }, null, 2));
     return;
   }
 

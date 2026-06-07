@@ -1,8 +1,10 @@
 # 跨机同步 — 设计稿（非实现计划）
 
+> **封存** — 见 [`docs/archive/cross-machine-sync/README.md`](../../archive/cross-machine-sync/README.md)。本机 E2E 稳定后再实现。
+
 > 日期：2026-06-07  
 > 上游调研：`docs/research/2026-06-07-cross-machine-sync.md`  
-> 状态：**待设计审查** — 通过后再 `writing-plans` 写实现计划
+> 状态：**已审查 · 已封存** — 实现计划已写，代码未开工
 
 ---
 

@@ -1,5 +1,7 @@
 # 跨机器文件队列 / Agent 任务中继同步模式调研
 
+> **封存** — 见 [`docs/archive/cross-machine-sync/README.md`](../archive/cross-machine-sync/README.md)。本机 E2E 稳定后再实现。
+
 > 日期：2026-06-07  
 > 范围：agent-relay Phase 3+ 跨机扩展的可选传输层，**非实现计划**  
 > 依据：`PRINCIPLES.md`、`FOCUS.md`、`RELIABILITY.md`、`ARCHITECTURE.md`、`src/store.mjs`、`src/relayd.mjs`

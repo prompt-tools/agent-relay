@@ -4,6 +4,11 @@
 
 **本机 Agent 任务邮政局**：Cursor（等）`send` 计划 → relayd 唤醒目标 CLI Agent → 做完再 `send` 回传。
 
+## 当前优先级（2026-06-07）
+
+1. **本机可用** — `docs/E2E.md` 可重复通过；`relay health` 绿；MCP + relayd 长期稳定  
+2. **跨机同步** — **封存**，文档在 `docs/archive/cross-machine-sync/`，本机验收后再做
+
 ## 已否决方向（勿再讨论/实现）
 
 | 方向 | 原因 |

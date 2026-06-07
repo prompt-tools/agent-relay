@@ -6,6 +6,8 @@ import { tmpdir } from 'node:os';
 import { initConfig } from '../src/config.mjs';
 import { healthReport, recentErrors, checkRelayd } from '../src/health.mjs';
 import { layout } from '../src/paths.mjs';
+import { sendTask } from '../src/store.mjs';
+import { saveProcessed } from '../src/relayd.mjs';
 
 test('healthReport returns structured checks', () => {
   const home = mkdtempSync(join(tmpdir(), 'agent-relay-health-'));
@@ -15,6 +17,35 @@ test('healthReport returns structured checks', () => {
     assert.equal(typeof report.ok, 'boolean');
     assert.equal(report.checks.nodeId, 'hermes');
     assert.equal(report.checks.relayd.ok, false);
+    assert.deepEqual(report.checks.orphanPendingPlans, []);
+  } finally {
+    rmSync(home, { recursive: true, force: true });
+  }
+});
+
+test('healthReport lists orphan pending plans', () => {
+  const home = mkdtempSync(join(tmpdir(), 'agent-relay-health-'));
+  try {
+    const config = initConfig(home, 'hermes');
+    sendTask(config, {
+      type: 'plan',
+      to: 'hermes',
+      from: 'cursor',
+      projectPath: '/tmp/p',
+      title: 'T',
+      body: { markdown: 'x' },
+    });
+    const plan = sendTask(config, {
+      type: 'plan',
+      to: 'hermes',
+      from: 'cursor',
+      projectPath: '/tmp/p',
+      title: 'dup',
+      body: { markdown: 'y' },
+    });
+    saveProcessed(home, new Set([plan.id]));
+    const report = healthReport(home);
+    assert.equal(report.checks.orphanPendingPlans.length, 1);
   } finally {
     rmSync(home, { recursive: true, force: true });
   }

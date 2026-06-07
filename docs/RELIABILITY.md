@@ -33,16 +33,16 @@
 
 - 任务 `id` 全局唯一（时间戳 + 随机）
 - `relay send` 若目标路径已存在 → 报错，不覆盖
-- `relay complete` 若已在 `done/` → 返回已有结果，不重复写 inbox
+- `relayd.processed.json` 防止重复 wake；`type=result` 且带 `taskId` 时内部将 plan `active→done`（无 `complete` 原语）
 
 ### 4. 失败路径
 
 | 事件 | 落盘 |
 |------|------|
-| 执行失败 | `failed/<to>/<id>.json` + `inbox/<replyTo>/` 带 `status: failed` |
-| 超时（人工） | 执行方 `relay fail <id> --reason "..."` |
+| 执行失败 | `failed/<to>/<id>.json`；派发方 `relay send --type failed` |
+| spawn 失败 | `relay recover` / relayd 自动 retry（最多 3 次） |
 
-CC 拉 `relay pull` 时同时看 `completed` 与 `failed`。
+派发方用 `relay receive <node> --type result|failed` 拉取回传。
 
 ### 5. 可观测
 
@@ -71,15 +71,9 @@ Cursor MCP / CLI / Hermes 话术 / Codex TOML 旁路脚本
 
 不在 core 里嵌 IDE SDK，降低脆性。
 
-### 跨机器（进阶，Phase 3+）
+### 跨机器（封存，最后做）
 
-| 方式 | 适用 |
-|------|------|
-| **Git 同步** `tasks/` + `inbox/` 私有仓 | 2–3 台开发机，最简单 |
-| **Syncthing / NFS** | 家庭实验室 |
-| **HTTP relayd** | 需要中心服务时再加，非 v1 |
-
-v1 **不做** 网络协议，避免重蹈联邦运维覆辙。
+见 [`docs/archive/cross-machine-sync/README.md`](archive/cross-machine-sync/README.md)。v1 本机验收通过前不实现 `relay sync`。
 
 ### 与 ruflo memory 分工
 

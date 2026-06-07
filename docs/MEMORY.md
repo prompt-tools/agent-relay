@@ -8,7 +8,8 @@
 2. **主 E2E 路径：cursor → hermes**（不是 codex；用户无 codex 额度）。
 3. **唤醒是核心 UX**，不是可选；靠 `relayd` + provider spawn。
 4. **按角色 setup**（sender/receiver/both），不要四 IDE 全家桶。
-5. **v1 = CLI + relayd + MCP**，不做 Docker / 联邦 / Web 面板。
+5. **v1 = CLI + relayd + MCP**，不做 Docker / 联邦。
+6. **跨机同步封存**（2026-06-07）：调研/设计/计划保留在 `docs/archive/cross-machine-sync/`；**本机 E2E 稳定前不写 `relay sync` 代码**。
 
 ## 已验证事实
 

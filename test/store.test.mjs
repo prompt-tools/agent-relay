@@ -4,7 +4,7 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { initConfig } from '../src/config.mjs';
-import { sendTask, claimTask, receiveTasks } from '../src/store.mjs';
+import { sendTask, claimTask, listTasks, receiveTasks } from '../src/store.mjs';
 
 test('send → claim → send result back', () => {
   const home = mkdtempSync(join(tmpdir(), 'agent-relay-'));
@@ -36,6 +36,10 @@ test('send → claim → send result back', () => {
     assert.equal(inbox.length, 1);
     assert.equal(inbox[0].taskId, plan.id);
     assert.equal(inbox[0].body.summary, 'ok');
+    const done = listTasks(config, 'codex', 'done');
+    assert.equal(done.length, 1);
+    assert.equal(done[0].id, plan.id);
+    assert.equal(done[0].status, 'done');
   } finally {
     rmSync(home, { recursive: true, force: true });
   }

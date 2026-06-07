@@ -5,6 +5,7 @@ import { loadNodes } from './nodes.mjs';
 import { detectClis } from '../scripts/setup.mjs';
 import { isCliReady } from '../scripts/auth.mjs';
 import { listStuckActive } from './recover.mjs';
+import { listOrphanPendingPlans } from './gc.mjs';
 
 export function checkRelayd(home) {
   const pidFile = layout(home).relaydPid;
@@ -56,6 +57,7 @@ export function healthReport(home) {
     relayd,
     cli: cliKey ? { key: cliKey, ...auth } : { ready: false, reason: 'no matching cli' },
     stuckActive: stuck.map(({ task, age }) => ({ id: task.id, ageMs: age, title: task.title })),
+    orphanPendingPlans: listOrphanPendingPlans(config),
     recentErrors: recentErrors(home),
   };
 

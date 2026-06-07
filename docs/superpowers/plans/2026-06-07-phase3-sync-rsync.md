@@ -1,5 +1,7 @@
 # Phase 3a: relay sync (rsync) Implementation Plan
 
+> **封存** — 见 [`docs/archive/cross-machine-sync/README.md`](../../archive/cross-machine-sync/README.md)。本机 E2E 稳定后再执行。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: `subagent-driven-development`  
 > **Design:** `docs/superpowers/specs/2026-06-07-cross-machine-sync-design.md`  
 > **Research:** `docs/research/2026-06-07-cross-machine-sync.md`

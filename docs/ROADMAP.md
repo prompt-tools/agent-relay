@@ -33,7 +33,19 @@
 
 - [x] antigravity-cli provider
 - [x] `relay serve` 自托管 Web 面板
-- [ ] 跨机（git/rsync 队列同步）
+
+## 当前优先级（本机）
+
+- [x] **本机 E2E CI 闭环** — `test/e2e-relayd.test.mjs` + `npm test` 60/60
+- [ ] **本机 live smoke 可重复** — 人工 `docs/E2E.md` 一条 send（可选 PROD3 OK）
+- [ ] `relay health` 无 orphan（`relay gc --yes` 清理历史脏数据）
+
+单机 Phase 3 功能已齐；**验收本机闭环** 后再做其它。
+
+## 封存 — 最后做
+
+- [ ] 跨机（git/rsync 队列同步）— 调研/设计/计划已就绪，**代码未开工**  
+  → [`docs/archive/cross-machine-sync/README.md`](archive/cross-machine-sync/README.md)
 
 ## 不做
 
