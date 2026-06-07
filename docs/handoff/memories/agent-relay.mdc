@@ -1,0 +1,19 @@
+---
+description: agent-relay — Superpowers + Cursor Subagent only
+alwaysApply: true
+---
+
+# agent-relay
+
+真源：**`docs/AGENT-CONTRACT.md`** · 记忆：**`docs/MEMORY.md`**
+
+## 必守
+
+- 先 **`using-superpowers`**，再按 CONTRACT **S/M/L** 选流程
+- Hermes 回传 → **`code-reviewer` 必审**（§0.3）→ 自主 push，少问用户
+- 完成 → fresh **`npm test`** + 同步 **MEMORY + WORKLOG**
+- 主 Agent 不写大 diff；禁止 inbox/Ruflo/四 IDE 全家桶
+
+## 产品
+
+send/receive · E2E **cursor → hermes** · 跨机 **封存**
