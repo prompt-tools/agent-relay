@@ -133,7 +133,15 @@
 - `test/e2e-relayd.test.mjs` relayd 闭环
 - 文档：E2E / RELIABILITY v2 对齐 / ROADMAP
 
-**生产**：`relay gc --yes` 清理历史 orphan pending
+**生产**：`relay gc --yes` 清理历史 orphan pending；**live smoke PROD3 OK** ~12s
+
+---
+
+## 2026-06-07 — live smoke + relay smoke CLI
+
+- 实测：plan `20260607-110837-3bee` → result `PROD3 OK` → `done/hermes/` 归档
+- 新增 `relay smoke` 可重复 live 验收
+- `npm test` 62/62
 
 ---
 

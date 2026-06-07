@@ -36,9 +36,9 @@
 
 ## 当前优先级（本机）
 
-- [x] **本机 E2E CI 闭环** — `test/e2e-relayd.test.mjs` + `npm test` 60/60
-- [ ] **本机 live smoke 可重复** — 人工 `docs/E2E.md` 一条 send（可选 PROD3 OK）
-- [ ] `relay health` 无 orphan（`relay gc --yes` 清理历史脏数据）
+- [x] **本机 E2E CI 闭环** — `test/e2e-relayd.test.mjs` + `npm test` 62/62
+- [x] **本机 live smoke 可重复** — `relay smoke`；实测 **PROD3 OK** ~12s（2026-06-07）
+- [x] `relay health` 无 orphan
 
 单机 Phase 3 功能已齐；**验收本机闭环** 后再做其它。
 

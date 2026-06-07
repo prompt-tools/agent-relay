@@ -10,6 +10,7 @@ All notable changes to agent-relay. Format based on [Keep a Changelog](https://k
 - `relay gc` — remove orphan pending plans already in `relayd.processed`
 - `health` check `orphanPendingPlans`
 - `test/e2e-relayd.test.mjs` — CI-provable cursor→hermes→cursor loop
+- `relay smoke` — live end-to-end smoke with poll + JSON result
 - Cross-machine research/design archived under `docs/archive/cross-machine-sync/`
 
 ## [0.2.0] - 2026-06-07

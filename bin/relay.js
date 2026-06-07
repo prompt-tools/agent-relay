@@ -34,6 +34,7 @@ Usage:
   relay serve [--host <addr>] [--port <n>]
   relay recover <node> [--task-id <id>] [--older-than <sec>]
   relay gc [--dry-run] [--yes]
+  relay smoke [--project <path>] [--marker <text>] [--timeout <sec>]
   relay setup [--role sender|receiver|both] [--node <nodeId>] [--dry-run] [--skip-auth]
 
 Deprecated (use send/receive instead):
@@ -223,6 +224,20 @@ async function run() {
     }
     const result = gcOrphanPendingPlans(config, { dryRun: false });
     console.log(JSON.stringify({ ok: true, ...result }, null, 2));
+    return;
+  }
+
+  if (cmd === 'smoke') {
+    const { runLiveSmoke } = await import('../src/smoke.mjs');
+    const projectPath = flag('--project') || process.cwd();
+    const marker = flag('--marker') || 'PROD3 OK';
+    const timeoutSec = Number(flag('--timeout') || 120);
+    if (!Number.isFinite(timeoutSec) || timeoutSec <= 0) {
+      throw new Error('--timeout must be a positive number of seconds');
+    }
+    const result = await runLiveSmoke(config, { projectPath, marker, timeoutSec });
+    console.log(JSON.stringify(result, null, 2));
+    if (!result.ok) process.exitCode = 1;
     return;
   }
 

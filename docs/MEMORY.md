@@ -16,7 +16,7 @@
 | 事实 | 证据 |
 |------|------|
 | Hermes 非交互唤醒 | `hermes chat -q "..." -Q --accept-hooks --yolo` |
-| 回传 = 再次 send | E2E `HELLO RELAY` 约 8s 回到 `pending/cursor/` |
+| 回传 = 再次 send | E2E `HELLO RELAY` 约 8s；**PROD3 OK** live smoke ~12s（2026-06-07） |
 | relayd 去重 | `relayd.processed.json` + claim |
 | MCP 与 CLI 同构 | `mcp/server.mjs` 调同一 `store.mjs` |
 | project.yaml 可省略 to | `.agent-relay/project.yaml` → `defaultTo: hermes` |

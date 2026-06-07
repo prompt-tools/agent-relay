@@ -76,6 +76,14 @@ relay receive cursor --type result
 ## 自动化验收
 
 ```bash
-npm test   # 含 relayd fake-spawn 全链路；当前 60/60
-relay health   # 看 orphanPendingPlans；非空则 relay gc --yes
+npm test   # 含 relayd fake-spawn 全链路；当前 62/62
+relay health   # orphanPendingPlans 应为 []
+relay smoke --project ~/Projects/agent-relay   # live：需 relayd + hermes（约 10–30s）
+```
+
+## Live smoke（可重复）
+
+```bash
+relay smoke --project ~/Projects/agent-relay --marker "PROD3 OK"
+# ok: true → summary 匹配 marker，plan 归档到 done/hermes/
 ```
