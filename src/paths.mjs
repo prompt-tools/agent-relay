@@ -64,11 +64,5 @@ export function ensureLayout(home) {
   ]) {
     if (!existsSync(dir)) mkdirSync(dir, { recursive: true, mode: 0o700 });
   }
-  for (const node of ['cursor', 'codex', 'hermes', 'antigravity']) {
-    for (const sub of ['pending', 'active', 'done', 'failed']) {
-      const d = join(p.tasks, sub, node);
-      if (!existsSync(d)) mkdirSync(d, { recursive: true, mode: 0o700 });
-    }
-  }
   return p;
 }

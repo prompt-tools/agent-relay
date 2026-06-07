@@ -9,7 +9,7 @@ import {
   mkdirSync,
   writeFileSync,
 } from 'node:fs';
-import { join } from 'node:path';
+import { join, dirname } from 'node:path';
 import { randomBytes } from 'node:crypto';
 import { layout, ensureLayout } from './paths.mjs';
 import { assertNode } from './config.mjs';
@@ -37,12 +37,10 @@ function taskFileName(id) {
   return `${id}.json`;
 }
 
-/** Generate a timestamp-based task ID (YYYYMMDD-HHMMSS-xxxx). */
+/** Generate a timestamp-based task ID (YYYYMMDDHHmmss-xxxxxxxx). */
 function newTaskId() {
-  const d = new Date();
-  const pad = (n) => String(n).padStart(2, '0');
-  const stamp = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
-  return `${stamp}-${randomBytes(2).toString('hex')}`;
+  const ts = new Date().toISOString().replace(/[-:TZ]/g, '').slice(0, 14);
+  return `${ts}-${randomBytes(4).toString('hex')}`;
 }
 
 /**
@@ -107,7 +105,7 @@ function archivePlanOnResult(config, executorNode, taskId) {
   const src = join(p.active(executorNode), taskFileName(taskId));
   if (!existsSync(src)) return null;
   const dst = join(p.done(executorNode), taskFileName(taskId));
-  if (!existsSync(join(p.done(executorNode), '..'))) ensureLayout(config.home);
+  mkdirSync(dirname(dst), { recursive: true, mode: 0o700 });
   try {
     renameSync(src, dst);
   } catch {
@@ -195,6 +193,7 @@ export function claimTask(config, node, id) {
   }
   const dst = join(p.active(node), taskFileName(id));
   if (!existsSync(src)) throw new Error(`Task not pending: ${id}`);
+  mkdirSync(dirname(dst), { recursive: true, mode: 0o700 });
   try {
     renameSync(src, dst);
   } catch {

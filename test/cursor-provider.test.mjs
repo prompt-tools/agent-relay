@@ -1,11 +1,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildCursorSpawn } from '../src/providers/cursor.mjs';
+import { buildSpawn } from '../src/providers/index.mjs';
 
 const CTX = { home: '/tmp/r', relayBin: '/app/bin/relay.js', binary: '/usr/bin/agent' };
 
 test('buildCursorSpawn uses agent --workspace --print', () => {
-  const spec = buildCursorSpawn(
+  const spec = buildSpawn(
+    'cursor-agent',
     { id: 't1', from: 'hermes', projectPath: '/proj', body: { markdown: 'do' } },
     CTX,
   );

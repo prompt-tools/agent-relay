@@ -8,20 +8,11 @@ import { listTasks, claimTask } from './store.mjs';
 import { getProvider, getNodeSpec } from './nodes.mjs';
 import { recoverTask } from './recover.mjs';
 import { appendLog } from './log.mjs';
-import { buildCodexSpawn } from './providers/codex.mjs';
-import { buildHermesSpawn } from './providers/hermes.mjs';
-import { buildCursorSpawn } from './providers/cursor.mjs';
-import { buildAntigravitySpawn } from './providers/antigravity.mjs';
+import { buildSpawn, PROVIDER_SPECS } from './providers/index.mjs';
 
 const RELAY_BIN = join(dirname(fileURLToPath(import.meta.url)), '..', 'bin', 'relay.js');
 const MAX_RETRIES = 3;
 
-const PROVIDERS = {
-  'codex-exec': buildCodexSpawn,
-  'hermes-cli': buildHermesSpawn,
-  'cursor-agent': buildCursorSpawn,
-  'antigravity-cli': buildAntigravitySpawn,
-};
 
 
 
@@ -105,10 +96,8 @@ export function releaseLock(home) {
  */
 export function buildSpawnForTask(home, task) {
   const provider = getProvider(home, task.to);
-  const build = PROVIDERS[provider];
-  if (!build) return null;
   const spec = getNodeSpec(home, task.to);
-  return build(task, { home, relayBin: RELAY_BIN, binary: spec.binary });
+  return buildSpawn(provider, task, { home, relayBin: RELAY_BIN, binary: spec.binary });
 }
 
 /**

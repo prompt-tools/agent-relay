@@ -14,13 +14,13 @@ import {
   handleWakeFailure,
   loadRetries,
 } from '../src/relayd.mjs';
-import { buildCodexSpawn } from '../src/providers/codex.mjs';
-import { buildHermesSpawn } from '../src/providers/hermes.mjs';
+import { buildSpawn } from '../src/providers/index.mjs';
 
 const CTX = { home: '/tmp/relay-home', relayBin: '/app/bin/relay.js' };
 
-test('buildCodexSpawn includes relay send tail', () => {
-  const spec = buildCodexSpawn(
+test('buildSpawn codex-exec includes relay send tail', () => {
+  const spec = buildSpawn(
+    'codex-exec',
     { id: 't1', from: 'cursor', projectPath: '/tmp/p', body: { markdown: 'do work' } },
     CTX,
   );
@@ -29,8 +29,9 @@ test('buildCodexSpawn includes relay send tail', () => {
   assert.ok(spec.args.join(' ').includes("--task-id 't1'"));
 });
 
-test('buildHermesSpawn uses hermes chat -q', () => {
-  const spec = buildHermesSpawn(
+test('buildSpawn hermes-cli uses hermes chat -q', () => {
+  const spec = buildSpawn(
+    'hermes-cli',
     { id: 't2', from: 'cursor', projectPath: '/tmp/p', body: { markdown: 'ping' } },
     CTX,
   );

@@ -1,11 +1,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildAntigravitySpawn } from '../src/providers/antigravity.mjs';
+import { buildSpawn } from '../src/providers/index.mjs';
 
 const CTX = { home: '/tmp/relay-home', relayBin: '/app/bin/relay.js' };
 
 test('buildAntigravitySpawn uses agy -p with skip-permissions', () => {
-  const spec = buildAntigravitySpawn(
+  const spec = buildSpawn(
+    'antigravity-cli',
     { id: 't1', from: 'cursor', projectPath: '/tmp/p', body: { markdown: 'do work' } },
     CTX,
   );
@@ -19,7 +20,8 @@ test('buildAntigravitySpawn uses agy -p with skip-permissions', () => {
 });
 
 test('buildAntigravitySpawn respects ctx.binary override', () => {
-  const spec = buildAntigravitySpawn(
+  const spec = buildSpawn(
+    'antigravity-cli',
     { id: 't2', from: 'hermes', projectPath: '/proj', body: { markdown: 'ping' } },
     { ...CTX, binary: '/opt/agy' },
   );
@@ -27,7 +29,8 @@ test('buildAntigravitySpawn respects ctx.binary override', () => {
 });
 
 test('buildAntigravitySpawn handles missing body', () => {
-  const spec = buildAntigravitySpawn(
+  const spec = buildSpawn(
+    'antigravity-cli',
     { id: 't3', from: 'cursor', projectPath: '/tmp/p' },
     CTX,
   );

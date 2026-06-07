@@ -1,5 +1,5 @@
-import { existsSync, renameSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { existsSync, renameSync, readFileSync, readdirSync, writeFileSync, mkdirSync } from 'node:fs';
+import { join, dirname } from 'node:path';
 import { layout } from './paths.mjs';
 import { loadConfig } from './config.mjs';
 
@@ -44,6 +44,7 @@ export function recoverTask(config, node, taskId) {
   const task = JSON.parse(readFileSync(src, 'utf8'));
   task.status = 'pending';
   delete task.claimedAt;
+  mkdirSync(dirname(dst), { recursive: true, mode: 0o700 });
   renameSync(src, dst);
   writeFileSync(dst, JSON.stringify(task, null, 2) + '\n', { mode: 0o600 });
   return task;
