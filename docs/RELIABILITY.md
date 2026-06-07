@@ -33,7 +33,7 @@
 
 - 任务 `id` 全局唯一（时间戳 + 随机）
 - `relay send` 若目标路径已存在 → 报错，不覆盖
-- `relayd.processed.json` 防止重复 wake；`type=result` 且带 `taskId` 时内部将 plan `active→done`（无 `complete` 原语）
+- `type=result` 且带 `taskId` 时内部将 plan `active→done`（archivePlanOnResult）
 
 ### 4. 失败路径
 
@@ -90,7 +90,7 @@ Cursor MCP / CLI / Hermes 话术 / Codex TOML 旁路脚本
 - **零原生依赖**：仅 Node 20+ 标准库
 - **权限**：`relay init` 创建 `0700` 目录
 - **跨平台路径**：`~` 展开，`path.join`，不硬编码 `/Users/...`
-- **测试**：Phase 1 含 `node --test` 覆盖 send/claim/complete 竞态
+- **测试**：Phase 1 含 `node --test` 覆盖 send/claim/result 竞态
 
 ## 反模式（明确不做）
 

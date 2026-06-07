@@ -3,7 +3,7 @@ import readline from 'node:readline';
 import { loadConfig } from '../src/config.mjs';
 import { sendTask, receiveTasks, claimTask } from '../src/store.mjs';
 
-const SERVER_INFO = { name: 'agent-relay', version: '0.1.0' };
+const SERVER_INFO = { name: 'agent-relay', version: '0.3.0' };
 
 const TOOLS = [
   {

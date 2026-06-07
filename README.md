@@ -59,6 +59,7 @@ relay receive cursor --type result
 | [docs/SETUP.md](docs/SETUP.md) | 安装与 OAuth |
 | [docs/PRINCIPLES.md](docs/PRINCIPLES.md) | 原则 |
 | [docs/MEMORY.md](docs/MEMORY.md) | 踩坑与决策 |
+| [docs/research/2026-06-07-full-repo-audit.md](docs/research/2026-06-07-full-repo-audit.md) | 全仓库审计报告 |
 | [CHANGELOG.md](CHANGELOG.md) | 版本变更 |
 
 ## 状态

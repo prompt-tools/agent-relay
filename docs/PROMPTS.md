@@ -1,34 +1,43 @@
 # 各 IDE 固定话术
 
-复制到对应 Agent 会话即可，无需记命令细节。
+> 对应 agent-relay v2：`send` / `receive` 文件队列 + `relayd` claim + `archivePlanOnResult`。
 
 ## Hermes（执行方）
 
 ```
 你是执行 Agent。请：
-1. 列出 ~/.agent-relay/tasks/pending/hermes/ 最新任务（或运行 relay list hermes）
-2. relay claim 该任务（或手动读 plan.json 的 plan.markdown）
-3. 按 acceptance 完成
-4. relay complete <id> --summary <摘要路径>
-5. 确认 ~/.agent-relay/inbox/cursor/ 已生成 result.json
+1. relay receive hermes          — 列出 pending/hermes/ 最新任务
+2. relay claim <id>              — 认领（移到 active/）
+3. 按 plan.markdown 与 acceptance 完成
+4. relay send cursor --type result --task-id <id> --body '{"summary":"…"}'
+   — 结果写入 pending/cursor/，plan 自动归档到 done/
 ```
 
-## Cursor / CC（计划方 · 收回报）
+## Cursor / CC（计划方 · 发送 / 收回传）
 
 **派发：**
 
 ```
-用 relay send hermes --plan <文件或正文> --title "任务标题"
+relay send hermes --project . --title "任务标题" --plan-text "## 步骤…"
 （或 MCP relay_send）
 ```
 
-**收结果：**
+**收回传：**
 
 ```
-relay pull cursor
-读 inbox/cursor/ 最新 result.json 与 artifacts/ 目录，继续下一步计划。
+relay receive cursor --type result
+读 pending/cursor/ 最新 result.json，继续下一步计划。
 ```
 
 ## Codex / Antigravity
 
 将路径中的 `hermes` 换成 `codex` 或 `antigravity` 即可。
+
+## 关键路径
+
+```
+pending/<to>/<id>.json   ← send 写入
+active/<to>/<id>.json    ← claim 移动
+done/<to>/<id>.json      ← archivePlanOnResult 归档
+pending/<from>/<id>.json ← result send 写回
+```

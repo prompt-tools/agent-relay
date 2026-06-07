@@ -1,8 +1,0 @@
-# Copy to ~/.agent-relay/config.yaml after `relay init`
-nodeId: cursor
-home: ~/.agent-relay
-nodes:
-  - cursor
-  - codex
-  - hermes
-  - antigravity
