@@ -245,6 +245,19 @@
 
 ---
 
+## 2026-06-07 — P1 分发就绪度
+
+**完成**（plan → review → fix → re-review → execute → review → push）：
+- `.github/workflows/ci.yml` — Node 20/22 × macOS/Ubuntu，timeout-minutes:10，npm cache
+- `.github/workflows/publish.yml` — release 触发，`npm publish --access public`，NPM_TOKEN
+- JSDoc：8 个 src 文件共 74 个 @param 标签
+- README.md 新增「Optional CLI Agents」表（hermes/cursor-agent/codex/antigravity）
+
+**审查**：两轮 sub-agent review，APPROVE。
+**测试**：62/62
+
+---
+
 ## 验证命令
 
 ```bash
