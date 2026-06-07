@@ -1,6 +1,6 @@
 {
   "name": "agent-relay",
-  "version": "0.0.0",
+  "version": "0.3.0",
   "description": "Lightweight cross-IDE agent task relay — plan in Cursor, execute in Hermes, artifacts back.",
   "type": "module",
   "bin": {

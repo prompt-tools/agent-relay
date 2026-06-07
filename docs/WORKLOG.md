@@ -171,6 +171,15 @@
 
 ---
 
+## 2026-06-07 — Hermes 执行 v0.3.0 prep
+
+**完成**：
+- `package.json` 版本 → `0.3.0`
+- `CHANGELOG.md` [Unreleased] → `[0.3.0] - 2026-06-07`（antigravity-cli、relay serve/smoke/gc、e2e-relayd、archivePlanOnResult）
+- 更新 compare 链接（v0.3.0）
+
+---
+
 ## 决策日志
 
 | 日期 | 决策 | 原因 |

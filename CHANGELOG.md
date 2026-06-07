@@ -4,13 +4,19 @@ All notable changes to agent-relay. Format based on [Keep a Changelog](https://k
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-06-07
+
 ### Added
 
-- `archivePlanOnResult` — result send archives plan to `done/` (internal, no `complete` CLI)
-- `relay gc` — remove orphan pending plans already in `relayd.processed`
-- `health` check `orphanPendingPlans`
-- `test/e2e-relayd.test.mjs` — CI-provable cursor→hermes→cursor loop
+- `antigravity-cli` provider (`agy -p` + `--dangerously-skip-permissions`)
+- `relay serve` — HTTP dashboard with `/api/watch`, `/api/health`, inline HTML panel
 - `relay smoke` — live end-to-end smoke with poll + JSON result
+- `relay gc` — remove orphan pending plans already in `relayd.processed`
+- `archivePlanOnResult` — result send archives plan to `done/`
+- `test/e2e-relayd.test.mjs` — CI-provable cursor→hermes→cursor loop
+- `health` check `orphanPendingPlans`
+- `relay watch` — progress/active/log terminal panel
+- setup TUI — numbered menu + y/n confirmation
 - Cross-machine research/design archived under `docs/archive/cross-machine-sync/`
 
 ## [0.2.0] - 2026-06-07
@@ -50,6 +56,7 @@ All notable changes to agent-relay. Format based on [Keep a Changelog](https://k
 - Task files: `{id}.json` (was `{id}.plan.json`)
 - Docs aligned to PRINCIPLES.md / Hermes primary path
 
-[Unreleased]: https://github.com/prompt-tools/agent-relay/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/prompt-tools/agent-relay/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/prompt-tools/agent-relay/releases/tag/v0.3.0
 [0.2.0]: https://github.com/prompt-tools/agent-relay/releases/tag/v0.2.0
 [0.1.0]: https://github.com/prompt-tools/agent-relay/releases/tag/v0.1.0
